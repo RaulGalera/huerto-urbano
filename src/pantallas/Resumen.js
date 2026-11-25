@@ -7,6 +7,7 @@ import { nombrePor, numero, ordenarPorFecha, temporadaActual, ultimoRiego } from
 import { useCuenta } from '../cuenta';
 import { calcularBeneficio, euros } from '../calculos';
 import Tiempo from '../componentes/Tiempo';
+import Graficas from '../componentes/Graficas';
 import { estadoSiembra, nombreMes, paraSembrar } from '../cultivos';
 import { t } from '../idioma';
 
@@ -53,17 +54,6 @@ export default function Resumen({ onPerfil }) {
   const mes = Number(hoy().slice(5, 7));
   const sembrarAhora = paraSembrar(mes);
   const cuentas = calcularBeneficio(datos, config, datos.temporadas.find((x) => x.id === elegida));
-
-  const porCultivo = {};
-  cosechas.forEach((c) => {
-    const s = siembras.find((x) => x.id === c.siembraId);
-    const nombre = s.cultivo.trim();
-    const k = nombre.toLowerCase();
-    if (!porCultivo[k]) porCultivo[k] = { nombre, kilos: 0 };
-    porCultivo[k].kilos += Number(c.kilos) || 0;
-  });
-  const ranking = Object.values(porCultivo).sort((a, b) => b.kilos - a.kilos);
-  const maximo = ranking.length && ranking[0].kilos > 0 ? ranking[0].kilos : 1;
 
   const avisos = datos.parcelas
     .map((p) => ({ parcela: p, dias: ultimoRiego(datos.riegos, p.id) }))
@@ -116,7 +106,7 @@ export default function Resumen({ onPerfil }) {
                 </Text>
                 <Pressable
                   onPress={() => guardar('riegos', { parcelaId: a.parcela.id, fecha: hoy(), litros: '', metodo: 'Manguera' })}
-                  style={[estilos.fila, { gap: 4, backgroundColor: colores.blanco, borderRadius: 14, paddingVertical: 4, paddingHorizontal: 10, borderWidth: 1, borderColor: colores.borde }]}
+                  style={[estilos.fila, { gap: 4, backgroundColor: colores.superficie, borderRadius: 14, paddingVertical: 4, paddingHorizontal: 10, borderWidth: 1, borderColor: colores.borde }]}
                 >
                   <Ionicons name="water" size={14} color={colores.verde} />
                   <Text style={{ color: colores.verde, fontSize: 12, fontWeight: '600' }}>{t('Regar hoy')}</Text>
@@ -164,22 +154,7 @@ export default function Resumen({ onPerfil }) {
         <Text style={{ color: colores.texto, fontSize: 14, textTransform: 'capitalize' }}>{sembrarAhora.join(', ')}</Text>
       </View>
 
-      <View style={[estilos.tarjeta, { paddingBottom: 20 }]}>
-        <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto, marginBottom: 8 }}>{t('Kilos por cultivo')}</Text>
-        {ranking.length === 0 ? (
-          <Text style={estilos.tarjetaTexto}>{t('Aun no hay cosechas en esta temporada.')}</Text>
-        ) : (
-          ranking.map((r) => (
-            <View key={r.nombre} style={[estilos.fila, { marginTop: 14 }]}>
-              <Text style={{ width: 90, fontSize: 13, color: colores.texto }} numberOfLines={1}>{r.nombre}</Text>
-              <View style={{ flex: 1, height: 20, backgroundColor: colores.verdeClaro, borderRadius: 4 }}>
-                <View style={{ height: 20, width: (r.kilos / maximo) * 100 + '%', backgroundColor: colores.verde, borderRadius: 4 }} />
-              </View>
-              <Text style={{ width: 60, textAlign: 'right', fontSize: 13, fontWeight: '600', color: colores.texto }}>{numero(r.kilos)} kg</Text>
-            </View>
-          ))
-        )}
-      </View>
+      <Graficas datos={datos} config={config} temporada={datos.temporadas.find((x) => x.id === elegida)} />
 
       {elegida ? (
         <View style={[estilos.tarjeta, { paddingBottom: 18 }]}>
