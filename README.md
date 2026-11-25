@@ -1,63 +1,200 @@
 # Huerto Urbano
 
-App para gestionar un huerto urbano: parcelas, siembras, riegos y cosechas organizadas por temporadas, con calculo del beneficio de cada temporada.
-Hecha con React Native y Expo. Funciona en movil (Expo Go), en web y en escritorio desde el navegador.
+App multiplataforma para gestionar un huerto urbano: parcelas, siembras, riegos y cosechas organizadas por temporadas, con prevision del tiempo, calendario de cultivos y calculo del beneficio de cada temporada.
 
-## Como arrancarla
+Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Android, iOS y web (escritorio desde el navegador).
 
-1. Instalar Node.js 20 o superior.
-2. En esta carpeta: `npm install`
-3. `npx expo start`
-   - Movil: escanear el QR con Expo Go, o por cable con `adb reverse tcp:8081 tcp:8081` y abrir `exp://127.0.0.1:8081` en Expo Go.
-   - Web / escritorio: pulsar `w` o ejecutar `npm run web`.
+![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
+![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
+![Tests](https://img.shields.io/badge/tests-30_pasan-2E7D32)
+![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
+
+## Indice
+
+- [Funcionalidades](#funcionalidades)
+- [Tecnologias](#tecnologias)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Scripts](#scripts)
+- [Tests](#tests)
+- [Arquitectura](#arquitectura)
+- [Modelo de datos](#modelo-de-datos)
+- [Calculo del beneficio](#calculo-del-beneficio)
+- [Idiomas](#idiomas)
+- [Privacidad, ley y accesibilidad](#privacidad-ley-y-accesibilidad)
+- [Seguridad](#seguridad)
+- [Hoja de ruta](#hoja-de-ruta)
+- [Convenciones del proyecto](#convenciones-del-proyecto)
+
+## Funcionalidades
+
+Gestion del huerto
+
+- Temporadas con fecha de inicio y fin. Cada temporada muestra sus siembras, kilos y beneficio para poder compararlas.
+- Parcelas con superficie, ubicacion, gastos por temporada y estado del riego.
+- Siembras con cultivo, parcela, temporada, fecha y cantidad. Fecha de cosecha estimada segun el cultivo.
+- Riegos con litros y metodo (manguera, regadera o goteo).
+- Cosechas con kilos por siembra.
+- Buscador en todas las listas (sin distinguir mayusculas ni tildes) y filtros por temporada, parcela y verdura.
+
+Pantalla de inicio
+
+- Aviso de parcelas sin regar desde hace 3 dias o mas, con boton "Regar hoy".
+- Tiempo de los proximos 3 dias con Open-Meteo y consejo de riego (lluvia, calor o helada).
+- Calendario del huerto: siembras listas para cosechar, proximas cosechas y que sembrar este mes.
+- Kilos por cultivo y beneficio de la temporada, total y por parcela.
+
+Cuentas
+
+- Registro e inicio de sesion locales. Cada usuario ve solo sus datos.
+- Idioma elegible al registrarse (espanol por defecto o ingles) y cambiable despues.
+- Mi cuenta: cambiar nombre, contrasena, idioma y ubicacion, copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
+
+Modo admin
+
+- Estadisticas de toda la app.
+- Precios de mercado por cultivo, precio del agua y porcentaje de impuestos.
+- Gestion de usuarios (dar o quitar admin, borrar).
+- Cargar un huerto de ejemplo para hacer demostraciones.
+
+## Tecnologias
+
+| Area | Tecnologia |
+| --- | --- |
+| Framework | React Native 0.88 con Expo SDK 58 |
+| Lenguaje | JavaScript (React 19, hooks y Context) |
+| Persistencia | AsyncStorage (localStorage en web) |
+| Tiempo | API de Open-Meteo, modelo AROME de Meteo-France (gratis y sin clave) |
+| Ubicacion | expo-location |
+| Iconos | @expo/vector-icons (Ionicons) |
+| Tests | Jest con jest-expo |
+
+No usa librerias de navegacion: las pestanas y los modales estan hechos a mano para que la app sea ligera y facil de seguir.
+
+## Puesta en marcha
+
+Requisitos: Node.js 20 o superior y la app Expo Go en el movil (o Android Studio con un emulador).
+
+```bash
+git clone https://github.com/RaulGalera/huerto-urbano.git
+cd huerto-urbano
+npm install
+npx expo start
+```
+
+- Movil por Wi-Fi: escanear el QR con Expo Go.
+- Movil por cable: `adb reverse tcp:8081 tcp:8081` y abrir `exp://127.0.0.1:8081` en Expo Go.
+- Web o escritorio: pulsar `w` en la terminal o ejecutar `npm run web`.
+
+La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`. Hay que cambiarla desde Mi cuenta.
+
+## Scripts
+
+| Comando | Que hace |
+| --- | --- |
+| `npm start` | Arranca Expo |
+| `npm run android` | Abre la app en Android |
+| `npm run ios` | Abre la app en iOS |
+| `npm run web` | Abre la app en el navegador |
+| `npm test` | Ejecuta los tests |
 
 ## Tests
 
-`npm test` ejecuta los tests de Jest de la carpeta __tests__: beneficio, fechas, precios, calendario de cultivos, consejo de riego y cifrado.
+```bash
+npm test
+```
 
-## Usuarios
+30 tests en `__tests__/` que cubren: calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador y filtros.
 
-- Cada usuario se registra con nombre, usuario y contrasena. Las contrasenas se guardan cifradas (SHA-256).
-- Cada usuario tiene sus propios datos.
-- La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`. Conviene cambiarla desde Mi cuenta.
+## Arquitectura
 
-## Modo admin
+```
+App.js                    Sesion, idioma, pestanas y navegacion
+src/
+  cuenta.js               Usuarios, sesion, config de precios, borrado de cuenta
+  datos.js                Datos de cada usuario (guardar, borrar, reemplazar)
+  claves.js               Contrasenas con sal y migracion de las antiguas
+  calculos.js             Beneficio por temporada y por parcela
+  precios.js              Precios de mercado por defecto
+  cultivos.js             Dias hasta cosecha y meses de siembra
+  tiempo.js               Prevision de Open-Meteo y consejo de riego
+  ubicacion.js            GPS con expo-location
+  copia.js                Exportar y restaurar datos, filtro del buscador
+  idioma.js               Textos en espanol e ingles
+  legal.js                Privacidad, aviso legal, condiciones, accesibilidad
+  util.js                 Fechas, numeros y ayudas varias
+  componentes/            ListaEditable, Formulario, Chips, Casilla, SelectorFecha, Tiempo
+  pantallas/              Resumen, Parcelas, Siembras, Riegos, Cosechas, Temporadas,
+                          Login, Perfil, Admin, Legal
+__tests__/                Tests de Jest
+docs/                     Documentacion (cumplimiento legal)
+```
 
-Desde el icono de usuario de Inicio, los administradores ven ademas:
+El estado se reparte en dos Context de React:
 
-- Estadisticas de toda la app (usuarios, parcelas, kilos y agua de todos).
-- Precios de mercado por cultivo (EUR/kg), precio del agua y porcentaje de impuestos.
-- Gestion de usuarios: dar o quitar admin y borrar usuarios.
-- Cargar un huerto de ejemplo para ensenar la app o borrar sus datos.
+- `CuentaProvider` (src/cuenta.js): lista de usuarios, sesion activa y configuracion global de precios.
+- `DatosProvider` (src/datos.js): datos del huerto del usuario con sesion, guardados con la clave `huerto_datos_<idUsuario>`.
 
-## Beneficio
+La logica que se puede probar (calculos, fechas, tiempo, claves, copia) esta en modulos sin React, separada de las pantallas.
 
-Beneficio = kilos cosechados x precio de mercado - agua de los riegos - gastos de las parcelas - impuestos.
-El calculo esta en src/calculos.js.
+## Modelo de datos
 
-## Que hace cada pantalla
+```
+Usuario     id, usuario, nombre, clave, sal, v, rol (admin | usuario), idioma, creado, legal
+Temporada   id, nombre, inicio, fin
+Parcela     id, nombre, metros, ubicacion, gastos, notas
+Siembra     id, cultivo, parcelaId, temporadaId, fecha, cantidad, notas
+Riego       id, parcelaId, fecha, litros, metodo
+Cosecha     id, siembraId, fecha, kilos, notas
+```
 
-- Inicio: temporada a elegir, aviso de parcelas sin regar con boton Regar hoy, tiempo de 3 dias con consejo de riego, totales, calendario del huerto (siembras listas para cosechar y que sembrar este mes), kilos por cultivo y beneficio.
-- Parcelas: alta, edicion y borrado. Muestra el estado del riego, los cultivos de la temporada actual y los gastos por temporada.
-- Siembras: cultivo, parcela, temporada, fecha y cantidad. Filtro por temporada, fecha de cosecha estimada y kilos cosechados de cada siembra.
-- Riegos: parcela, fecha, litros y metodo. Filtro por parcela y litros totales.
-- Cosechas: siembra, fecha y kilos.
-- Temporadas: nombre y fechas de inicio y fin.
+Las fechas se guardan en ISO (AAAA-MM-DD) y se muestran como DD/MM/AAAA. Al borrar una parcela, siembra o temporada se borra en cascada lo que depende de ella.
 
-Las fechas se eligen con un calendario y se muestran como DD/MM/AAAA. Para editar o borrar un registro, se pulsa sobre su tarjeta.
-La ubicacion del huerto se toma del GPS del movil, o se elige una ciudad en Mi cuenta.
+## Calculo del beneficio
 
-Los datos se guardan en el propio dispositivo con AsyncStorage (en web, en el almacenamiento del navegador).
+```
+beneficio = kilos x precio de mercado
+          - litros / 1000 x precio del agua
+          - gastos de las parcelas usadas en la temporada
+          - impuestos (porcentaje sobre el beneficio positivo)
+```
 
-## Estructura
+Esta en `src/calculos.js`. Los precios los pone el administrador.
 
-- App.js: sesion, pestanas y navegacion.
-- src/cuenta.js: usuarios, sesion y configuracion de precios.
-- src/datos.js: guardado y carga de los datos de cada usuario.
-- src/calculos.js: calculo del beneficio.
-- src/precios.js: precios de mercado por defecto.
-- src/cultivos.js: dias hasta la cosecha y meses de siembra de cada cultivo.
-- src/tiempo.js: prevision del tiempo y consejo de riego con Open-Meteo (gratis y sin clave). Usa el modelo AROME de Meteo-France (1,3 km) y la probabilidad de lluvia del modelo general.
-- src/ubicacion.js: ubicacion del movil por GPS con expo-location.
-- src/componentes: lista editable y formulario reutilizables.
-- src/pantallas: una pantalla por cada apartado, mas Login, Perfil y Admin.
+## Idiomas
+
+Espanol (por defecto) e ingles. Los textos estan en `src/idioma.js`: la clave es el texto en espanol y la traduccion va en el bloque `en`. Para anadir un idioma basta con anadir un bloque nuevo y su entrada en `IDIOMAS`. Si falta una traduccion se ve el texto en espanol.
+
+## Privacidad, ley y accesibilidad
+
+La app esta pensada para cumplir el RGPD, la LOPDGDD, la LSSI, la Ley 11/2023 de accesibilidad y las normas de Google Play:
+
+- Edad minima de 14 anos y aceptacion de la politica de privacidad al registrarse, guardando version y fecha.
+- Politica de privacidad, aviso legal, condiciones y accesibilidad dentro de la app, a dos toques como mucho.
+- Derechos del usuario desde la app: ver, corregir, exportar y borrar sus datos.
+- El GPS solo se pide cuando el usuario pulsa el boton.
+- Sin publicidad, sin analitica y sin SDK de terceros.
+- Botones con nombre para lectores de pantalla (WCAG 2.1 AA).
+
+El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-legal.md](docs/cumplimiento-legal.md). Antes de publicar hay que rellenar el email de contacto y la web de borrado en `src/legal.js`.
+
+## Seguridad
+
+- Contrasenas con sal aleatoria de 16 bytes y 2000 vueltas de SHA-256. Las cuentas con el formato antiguo se migran solas al iniciar sesion.
+- El repositorio no contiene claves ni secretos. Los ficheros `.env` estan en `.gitignore`.
+- Open-Meteo no necesita clave y solo recibe coordenadas, nunca datos del usuario.
+
+## Hoja de ruta
+
+- API REST en AWS (region de la UE) para sincronizar los datos entre dispositivos, con HTTPS, datos cifrados, autenticacion con token y endpoints para exportar y borrar la cuenta. Los requisitos estan en `docs/cumplimiento-legal.md`.
+- Formulas de beneficio definitivas.
+- Notificaciones de riego.
+
+## Convenciones del proyecto
+
+- Codigo en espanol, sin comentarios, sin acentos ni caracteres especiales en codigo y textos de la app.
+- Un commit por cada mejora, con mensaje corto en espanol.
+- Antes de subir: `npm test` tiene que pasar entero.
+
+## Autor
+
+Raul Galera, 2 DAM.
