@@ -39,11 +39,13 @@ export function normalizar(texto) {
     .trim();
 }
 
+export function buscarEnCatalogo(catalogo, nombre) {
+  const n = normalizar(nombre);
+  const opciones = [n, n.replace(/s$/, ''), n.replace(/es$/, '')];
+  const clave = opciones.find((o) => catalogo[o] !== undefined);
+  return clave === undefined ? null : catalogo[clave];
+}
+
 export function precioDe(config, cultivo) {
-  const n = normalizar(cultivo);
-  const precios = config.precios || {};
-  if (precios[n] !== undefined) return precios[n];
-  const singular = n.replace(/es$/, '').replace(/s$/, '');
-  if (precios[singular] !== undefined) return precios[singular];
-  return null;
+  return buscarEnCatalogo(config.precios || {}, cultivo);
 }

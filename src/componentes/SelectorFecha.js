@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
-import { leerFecha, verFecha } from '../util';
+import { diasDelMes, leerFecha, verFecha } from '../util';
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -13,17 +13,6 @@ function hoyIso() {
 
 function aIso(anio, mes, dia) {
   return anio + '-' + String(mes + 1).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
-}
-
-export function diasDelMes(anio, mes) {
-  const primero = new Date(Date.UTC(anio, mes, 1)).getUTCDay();
-  const huecos = (primero + 6) % 7;
-  const total = new Date(Date.UTC(anio, mes + 1, 0)).getUTCDate();
-  const celdas = [];
-  for (let i = 0; i < huecos; i++) celdas.push(null);
-  for (let d = 1; d <= total; d++) celdas.push(d);
-  while (celdas.length % 7 !== 0) celdas.push(null);
-  return celdas;
 }
 
 function Calendario({ inicial, onElegir, onCerrar }) {

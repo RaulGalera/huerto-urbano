@@ -1,4 +1,4 @@
-import { normalizar } from './precios';
+import { buscarEnCatalogo } from './precios';
 
 export const cultivos = {
   tomate: { dias: 80, meses: [2, 3, 4, 5] },
@@ -33,10 +33,7 @@ export function nombreMes(mes) {
 }
 
 export function infoCultivo(nombre) {
-  const n = normalizar(nombre);
-  if (cultivos[n]) return cultivos[n];
-  const singular = n.replace(/es$/, '').replace(/s$/, '');
-  return cultivos[singular] || null;
+  return buscarEnCatalogo(cultivos, nombre);
 }
 
 function sumarDias(iso, dias) {

@@ -47,3 +47,14 @@ export function ultimoRiego(riegos, parcelaId) {
 export function temporadaActual(temporadas, hoy) {
   return temporadas.find((t) => t.inicio <= hoy && hoy <= t.fin);
 }
+
+export function diasDelMes(anio, mes) {
+  const primero = new Date(Date.UTC(anio, mes, 1)).getUTCDay();
+  const huecos = (primero + 6) % 7;
+  const total = new Date(Date.UTC(anio, mes + 1, 0)).getUTCDate();
+  const celdas = [];
+  for (let i = 0; i < huecos; i++) celdas.push(null);
+  for (let d = 1; d <= total; d++) celdas.push(d);
+  while (celdas.length % 7 !== 0) celdas.push(null);
+  return celdas;
+}
