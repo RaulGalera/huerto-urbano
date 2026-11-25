@@ -58,3 +58,18 @@ export function diasDelMes(anio, mes) {
   while (celdas.length % 7 !== 0) celdas.push(null);
   return celdas;
 }
+
+export function claveCultivo(nombre) {
+  return String(nombre || '').trim().toLowerCase();
+}
+
+export function cultivosDe(siembras) {
+  const vistos = {};
+  siembras.forEach((s) => {
+    const k = claveCultivo(s.cultivo);
+    if (k && !vistos[k]) vistos[k] = s.cultivo.trim().charAt(0).toUpperCase() + s.cultivo.trim().slice(1);
+  });
+  return Object.keys(vistos)
+    .sort((a, b) => a.localeCompare(b))
+    .map((k) => ({ id: k, texto: vistos[k] }));
+}

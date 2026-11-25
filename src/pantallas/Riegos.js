@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, Text } from 'react-native';
+import { Text } from 'react-native';
 import ListaEditable from '../componentes/ListaEditable';
+import Chips from '../componentes/Chips';
 import { hoy, useDatos } from '../datos';
-import { colores, estiloChip, estilos } from '../estilos';
+import { colores, estilos } from '../estilos';
 import { nombrePor, numero, ordenarPorFecha, verFecha } from '../util';
 
 export default function Riegos() {
@@ -14,16 +15,7 @@ export default function Riegos() {
   const litros = items.reduce((a, r) => a + (Number(r.litros) || 0), 0);
   const cabecera = (
     <>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginBottom: 10 }} contentContainerStyle={{ gap: 8 }}>
-        {filtros.map((f) => {
-          const e = estiloChip(f.id === filtro);
-          return (
-            <Pressable key={f.id} style={e.caja} onPress={() => setFiltro(f.id)}>
-              <Text style={e.texto}>{f.texto}</Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      <Chips opciones={filtros} valor={filtro} onCambiar={setFiltro} abajo={10} />
       <Text style={[estilos.tarjetaTexto, { marginTop: 0, marginBottom: 10 }]}>
         {items.length} {items.length === 1 ? 'riego' : 'riegos'} - {numero(litros, 0)} litros en total
       </Text>

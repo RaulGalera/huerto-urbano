@@ -21,3 +21,12 @@ test('busca precios sin importar mayusculas, acentos ni plurales', () => {
   expect(precioDe({ precios: { tomate: 2 } }, 'Tomates')).toBe(2);
   expect(precioDe(config, 'kiwano')).toBeNull();
 });
+
+test('cultivosDe junta nombres repetidos y los ordena', () => {
+  const { cultivosDe } = require('../src/util');
+  const lista = cultivosDe([{ cultivo: 'tomate' }, { cultivo: ' Tomate ' }, { cultivo: 'Lechuga' }, { cultivo: '' }]);
+  expect(lista).toEqual([
+    { id: 'lechuga', texto: 'Lechuga' },
+    { id: 'tomate', texto: 'Tomate' },
+  ]);
+});

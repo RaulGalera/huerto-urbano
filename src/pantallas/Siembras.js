@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, Text } from 'react-native';
 import ListaEditable from '../componentes/ListaEditable';
 import { hoy, useDatos } from '../datos';
-import { estiloChip } from '../estilos';
-import { nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
+import Chips from '../componentes/Chips';
+import { claveCultivo, cultivosDe, nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
 import { estadoSiembra } from '../cultivos';
 import { colores } from '../estilos';
 
@@ -13,6 +12,7 @@ export default function Siembras() {
   const [filtroGuardado, setFiltro] = useState(null);
   const filtro = filtroGuardado === 'todas' || datos.temporadas.some((t) => t.id === filtroGuardado) ? filtroGuardado : actual ? actual.id : 'todas';
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
+  const [verdura, setVerdura] = useState('todas');
 
   const campos = [
     { clave: 'cultivo', etiqueta: 'Cultivo', tipo: 'texto', obligatorio: true, ejemplo: 'Ej: Tomate' },
@@ -24,7 +24,10 @@ export default function Siembras() {
   ];
 
   const filtros = [...temporadas.map((t) => ({ id: t.id, texto: t.nombre })), { id: 'todas', texto: 'Todas' }];
-  const items = ordenarPorFecha(filtro === 'todas' ? datos.siembras : datos.siembras.filter((s) => s.temporadaId === filtro));
+  const deTemporada = filtro === 'todas' ? datos.siembras : datos.siembras.filter((s) => s.temporadaId === filtro);
+  const verduras = cultivosDe(deTemporada);
+  const verduraActiva = verduras.some((v) => v.id === verdura) ? verdura : 'todas';
+  const items = ordenarPorFecha(verduraActiva === 'todas' ? deTemporada : deTemporada.filter((s) => claveCultivo(s.cultivo) === verduraActiva));
 
   function estimacion(s) {
     const e = estadoSiembra(s, datos.cosechas, hoy());
@@ -47,16 +50,10 @@ export default function Siembras() {
   }
 
   const cabecera = (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginBottom: 14 }} contentContainerStyle={{ gap: 8 }}>
-      {filtros.map((f) => {
-        const e = estiloChip(f.id === filtro);
-        return (
-          <Pressable key={f.id} style={e.caja} onPress={() => setFiltro(f.id)}>
-            <Text style={e.texto}>{f.texto}</Text>
-          </Pressable>
-        );
-      })}
-    </ScrollView>
+    <>
+      <Chips opciones={filtros} valor={filtro} onCambiar={setFiltro} abajo={verduras.length > 1 ? 8 : 14} />
+      {verduras.length > 1 ? <Chips opciones={[{ id: 'todas', texto: 'Todas las verduras' }, ...verduras]} valor={verduraActiva} onCambiar={setVerdura} /> : null}
+    </>
   );
 
   return (
