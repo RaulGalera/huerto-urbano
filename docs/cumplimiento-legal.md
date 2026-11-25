@@ -21,7 +21,7 @@ Este documento resume que leyes afectan a la app, que hace ya la app para cumpli
 
 ## Que falta antes de publicar
 
-- Rellenar en `src/legal.js` el email de contacto y la web donde se puede pedir el borrado de la cuenta sin la app (Google Play lo exige).
+- Para publicar en Google Play hace falta una pagina web donde pedir el borrado de la cuenta sin la app. De momento se pide por email (ya puesto en `src/legal.js`).
 - Rellenar el formulario de seguridad de datos de Google Play Console y la etiqueta de privacidad de App Store.
 
 ## Que tiene que cumplir la API REST en AWS

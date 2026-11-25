@@ -2,8 +2,7 @@ export const VERSION_LEGAL = '2026-11-25';
 
 export const RESPONSABLE = {
   nombre: 'Raul Galera',
-  email: 'PENDIENTE: email de contacto',
-  web: 'PENDIENTE: web para pedir el borrado de la cuenta',
+  email: 'raulgalera67@gmail.com',
 };
 
 const es = [
@@ -19,7 +18,7 @@ const es = [
       'Cuanto tiempo: mientras tengas la cuenta. Si la borras, se borran tus datos en el momento y las copias de seguridad del servidor se eliminan en un maximo de 30 dias.',
       'Tus derechos: puedes ver y corregir tus datos (Mi cuenta), descargarlos (Exportar mis datos), borrar la cuenta (Borrar mi cuenta) y oponerte o limitar el tratamiento escribiendo a ' + RESPONSABLE.email + '. Si no te atendemos bien, puedes reclamar ante la Agencia Espanola de Proteccion de Datos (www.aepd.es).',
       'Menores: hay que tener 14 anos o mas. Si tienes menos, tienen que registrarte tus padres o tutores.',
-      'Borrado sin la app: ' + RESPONSABLE.web + '.',
+      'Borrado sin la app: escribe a ' + RESPONSABLE.email + ' con el asunto Borrar cuenta y la borramos en menos de un mes.',
     ],
   },
   {
@@ -59,7 +58,7 @@ const en = [
       'How long: while you keep your account. If you delete it, your data is deleted at once and server backups are removed within 30 days.',
       'Your rights: you can see and fix your data (My account), download it (Export my data), delete the account (Delete my account) and object or limit processing by writing to ' + RESPONSABLE.email + '. You can complain to the Spanish Data Protection Agency (www.aepd.es).',
       'Minors: you must be 14 or older. If you are younger, your parents or guardians must sign you up.',
-      'Delete without the app: ' + RESPONSABLE.web + '.',
+      'Delete without the app: write to ' + RESPONSABLE.email + ' with the subject Delete account and we will delete it within one month.',
     ],
   },
   {

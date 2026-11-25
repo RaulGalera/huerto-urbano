@@ -177,7 +177,7 @@ La app esta pensada para cumplir el RGPD, la LOPDGDD, la LSSI, la Ley 11/2023 de
 - Sin publicidad, sin analitica y sin SDK de terceros.
 - Botones con nombre para lectores de pantalla (WCAG 2.1 AA).
 
-El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-legal.md](docs/cumplimiento-legal.md). Antes de publicar hay que rellenar el email de contacto y la web de borrado en `src/legal.js`.
+El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-legal.md](docs/cumplimiento-legal.md). Para publicar en Google Play falta una pagina web para pedir el borrado de la cuenta; de momento se pide por email.
 
 ## Seguridad
 
