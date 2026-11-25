@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estiloChip, estilos } from '../estilos';
 import { hoy, useDatos } from '../datos';
@@ -10,6 +10,8 @@ import Tiempo from '../componentes/Tiempo';
 import Graficas from '../componentes/Graficas';
 import { estadoSiembra, nombreMes, paraSembrar } from '../cultivos';
 import { t } from '../idioma';
+import { htmlBalance } from '../informe';
+import { compartirPdf } from '../pdf';
 
 const DIAS_AVISO_RIEGO = 3;
 
@@ -54,6 +56,15 @@ export default function Resumen({ onPerfil }) {
   const mes = Number(hoy().slice(5, 7));
   const sembrarAhora = paraSembrar(mes);
   const cuentas = calcularBeneficio(datos, config, datos.temporadas.find((x) => x.id === elegida));
+
+  async function pdf() {
+    const temporada = datos.temporadas.find((x) => x.id === elegida);
+    try {
+      await compartirPdf(htmlBalance(datos, config, temporada, usuario ? usuario.nombre : '', hoy()), t('Balance') + ' ' + temporada.nombre);
+    } catch (e) {
+      Alert.alert(t('No se pudo crear el PDF'));
+    }
+  }
 
   const avisos = datos.parcelas
     .map((p) => ({ parcela: p, dias: ultimoRiego(datos.riegos, p.id) }))
@@ -160,7 +171,11 @@ export default function Resumen({ onPerfil }) {
         <View style={[estilos.tarjeta, { paddingBottom: 18 }]}>
           <View style={[estilos.fila, { gap: 8, marginBottom: 4 }]}>
             <Ionicons name="cash-outline" size={20} color={colores.verde} />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }}>{t('Beneficio de la temporada')}</Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto, flex: 1 }}>{t('Beneficio de la temporada')}</Text>
+            <Pressable onPress={pdf} hitSlop={10} style={[estilos.fila, { gap: 4 }]} accessibilityRole="button" accessibilityLabel={t('Descargar PDF')}>
+              <Ionicons name="download-outline" size={18} color={colores.verde} />
+              <Text style={{ color: colores.verde, fontSize: 13, fontWeight: '600' }}>PDF</Text>
+            </Pressable>
           </View>
           <Linea texto={t('Venta a precio de mercado')} valor={euros(cuentas.ingresos)} color={colores.verde} />
           <Linea texto={t('Agua') + ' (' + numero(cuentas.litros, 0) + ' L)'} valor={euros(-cuentas.agua)} color={colores.rojo} />

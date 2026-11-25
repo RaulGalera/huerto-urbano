@@ -27,7 +27,8 @@
         {
           "locationWhenInUsePermission": "La app usa tu ubicacion para mostrar el tiempo de tu huerto."
         }
-      ]
+      ],
+      "expo-sharing"
     ]
   }
 }
