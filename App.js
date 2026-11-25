@@ -6,6 +6,7 @@ import { DatosProvider, useDatos } from './src/datos';
 import { CuentaProvider, useCuenta } from './src/cuenta';
 import Login from './src/pantallas/Login';
 import Perfil from './src/pantallas/Perfil';
+import Bienvenida from './src/componentes/Bienvenida';
 import { colores, ponerTema } from './src/estilos';
 import Resumen from './src/pantallas/Resumen';
 import Parcelas from './src/pantallas/Parcelas';
@@ -26,6 +27,7 @@ const pestanas = [
 
 function Contenido() {
   const { cargado } = useDatos();
+  const { usuario, marcarBienvenida } = useCuenta();
   const [actual, setActual] = useState('resumen');
   const [perfil, setPerfil] = useState(false);
   const { Pantalla } = pestanas.find((p) => p.clave === actual);
@@ -55,6 +57,7 @@ function Contenido() {
         })}
       </View>
       {perfil ? <Perfil onCerrar={() => setPerfil(false)} /> : null}
+      {usuario && !usuario.bienvenida ? <Bienvenida onFin={() => marcarBienvenida(usuario.id)} /> : null}
     </View>
   );
 }

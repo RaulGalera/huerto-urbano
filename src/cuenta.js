@@ -127,6 +127,10 @@ export function CuentaProvider({ children }) {
     guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, tema } : x)));
   }
 
+  function marcarBienvenida(id) {
+    guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, bienvenida: true } : x)));
+  }
+
   function cambiarIdioma(id, idioma) {
     guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, idioma } : x)));
   }
@@ -154,7 +158,7 @@ export function CuentaProvider({ children }) {
 
   return (
     <CuentaContext.Provider
-      value={{ usuarios, usuario, esAdmin: usuario ? usuario.rol === 'admin' : false, config, cargado, entrar, registrar, salir, cambiarContrasena, cambiarNombre, cambiarIdioma, cambiarTema, borrarMiCuenta, cambiarRol, borrarUsuario, guardarConfig }}
+      value={{ usuarios, usuario, esAdmin: usuario ? usuario.rol === 'admin' : false, config, cargado, entrar, registrar, salir, cambiarContrasena, cambiarNombre, cambiarIdioma, cambiarTema, marcarBienvenida, borrarMiCuenta, cambiarRol, borrarUsuario, guardarConfig }}
     >
       {children}
     </CuentaContext.Provider>
