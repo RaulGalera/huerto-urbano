@@ -36,8 +36,8 @@ function aTexto(n) {
   return String(n).replace('.', ',');
 }
 
-function aNumero(t) {
-  const n = Number(String(t).replace(',', '.'));
+function aNumero(texto) {
+  const n = Number(String(texto).replace(',', '.'));
   return isNaN(n) || n < 0 ? null : n;
 }
 
@@ -137,7 +137,7 @@ export default function Admin() {
                 style={[estilos.input, { width: 90, height: 38, textAlign: 'right' }]}
                 value={p.precio}
                 keyboardType="decimal-pad"
-                onChangeText={(t) => setPrecios(precios.map((x) => (x.cultivo === p.cultivo ? { ...x, precio: t } : x)))}
+                onChangeText={(v) => setPrecios(precios.map((x) => (x.cultivo === p.cultivo ? { ...x, precio: v } : x)))}
               />
               <Pressable hitSlop={8} onPress={() => setPrecios(precios.filter((x) => x.cultivo !== p.cultivo))} accessibilityRole="button" accessibilityLabel={t('Quitar') + ' ' + p.cultivo}>
                 <Ionicons name="close-circle-outline" size={22} color={colores.rojo} />

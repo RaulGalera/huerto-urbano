@@ -64,8 +64,8 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
                 <Text style={[estilos.tarjetaTitulo, { flex: 1 }]}>{renderTitulo(item)}</Text>
                 {dato ? <Text style={{ fontSize: 11, fontWeight: '600', color: dato.color, marginLeft: 8 }}>{dato.texto}</Text> : null}
               </View>
-              {renderTexto(item).filter(Boolean).map((t, i) => (
-                <Text key={i} style={estilos.tarjetaTexto}>{t}</Text>
+              {renderTexto(item).filter(Boolean).map((linea, i) => (
+                <Text key={i} style={estilos.tarjetaTexto}>{linea}</Text>
               ))}
             </Pressable>
           );

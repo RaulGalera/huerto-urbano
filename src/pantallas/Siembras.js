@@ -11,20 +11,20 @@ export default function Siembras() {
   const { datos } = useDatos();
   const actual = temporadaActual(datos.temporadas, hoy());
   const [filtroGuardado, setFiltro] = useState(null);
-  const filtro = filtroGuardado === 'todas' || datos.temporadas.some((t) => t.id === filtroGuardado) ? filtroGuardado : actual ? actual.id : 'todas';
+  const filtro = filtroGuardado === 'todas' || datos.temporadas.some((x) => x.id === filtroGuardado) ? filtroGuardado : actual ? actual.id : 'todas';
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
   const [verdura, setVerdura] = useState('todas');
 
   const campos = [
     { clave: 'cultivo', etiqueta: t('Cultivo'), tipo: 'texto', obligatorio: true, ejemplo: t('Ej: Tomate') },
     { clave: 'parcelaId', etiqueta: t('Parcela'), tipo: 'desplegable', obligatorio: true, opciones: datos.parcelas.map((p) => ({ valor: p.id, texto: p.nombre })) },
-    { clave: 'temporadaId', etiqueta: t('Temporada'), tipo: 'desplegable', obligatorio: true, opciones: temporadas.map((t) => ({ valor: t.id, texto: t.nombre })) },
+    { clave: 'temporadaId', etiqueta: t('Temporada'), tipo: 'desplegable', obligatorio: true, opciones: temporadas.map((x) => ({ valor: x.id, texto: x.nombre })) },
     { clave: 'fecha', etiqueta: t('Fecha de siembra'), tipo: 'fecha', obligatorio: true },
     { clave: 'cantidad', etiqueta: t('Plantas o semillas'), tipo: 'numero' },
     { clave: 'notas', etiqueta: t('Notas'), tipo: 'largo' },
   ];
 
-  const filtros = [...temporadas.map((t) => ({ id: t.id, texto: t.nombre })), { id: 'todas', texto: t('Todas') }];
+  const filtros = [...temporadas.map((x) => ({ id: x.id, texto: x.nombre })), { id: 'todas', texto: t('Todas') }];
   const deTemporada = filtro === 'todas' ? datos.siembras : datos.siembras.filter((s) => s.temporadaId === filtro);
   const verduras = cultivosDe(deTemporada);
   const verduraActiva = verduras.some((v) => v.id === verdura) ? verdura : 'todas';

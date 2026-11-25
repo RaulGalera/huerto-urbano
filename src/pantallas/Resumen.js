@@ -37,7 +37,7 @@ export default function Resumen({ onPerfil }) {
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
   const actual = temporadaActual(temporadas, hoy());
   const [elegidaGuardada, setElegida] = useState(null);
-  const elegida = temporadas.some((t) => t.id === elegidaGuardada) ? elegidaGuardada : actual ? actual.id : temporadas[0] ? temporadas[0].id : null;
+  const elegida = temporadas.some((x) => x.id === elegidaGuardada) ? elegidaGuardada : actual ? actual.id : temporadas[0] ? temporadas[0].id : null;
 
   const siembras = datos.siembras.filter((s) => s.temporadaId === elegida);
   const cosechas = datos.cosechas.filter((c) => siembras.some((s) => s.id === c.siembraId));
@@ -52,7 +52,7 @@ export default function Resumen({ onPerfil }) {
     .sort((a, b) => a.e.faltan - b.e.faltan);
   const mes = Number(hoy().slice(5, 7));
   const sembrarAhora = paraSembrar(mes);
-  const cuentas = calcularBeneficio(datos, config, datos.temporadas.find((t) => t.id === elegida));
+  const cuentas = calcularBeneficio(datos, config, datos.temporadas.find((x) => x.id === elegida));
 
   const porCultivo = {};
   cosechas.forEach((c) => {
@@ -91,11 +91,11 @@ export default function Resumen({ onPerfil }) {
         <Text style={estilos.tarjetaTexto}>{t('Crea una temporada en la pestana Temp. para ver el resumen.')}</Text>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-          {temporadas.map((t) => {
-            const e = estiloChip(t.id === elegida);
+          {temporadas.map((x) => {
+            const e = estiloChip(x.id === elegida);
             return (
-              <Pressable key={t.id} style={e.caja} onPress={() => setElegida(t.id)}>
-                <Text style={e.texto}>{t.nombre}</Text>
+              <Pressable key={x.id} style={e.caja} onPress={() => setElegida(x.id)}>
+                <Text style={e.texto}>{x.nombre}</Text>
               </Pressable>
             );
           })}

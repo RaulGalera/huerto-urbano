@@ -125,7 +125,7 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
               <TextInput
                 style={[estilos.input, c.tipo === 'largo' ? { height: 96, paddingTop: 12, textAlignVertical: 'top' } : null]}
                 value={valores[c.clave] === undefined || valores[c.clave] === null ? '' : String(valores[c.clave])}
-                onChangeText={(t) => cambiar(c.clave, t)}
+                onChangeText={(v) => cambiar(c.clave, v)}
                 keyboardType={c.tipo === 'numero' ? 'decimal-pad' : c.tipo === 'fecha' ? 'numbers-and-punctuation' : 'default'}
                 placeholder={c.tipo === 'fecha' ? t('DD/MM/AAAA') : c.ejemplo || ''}
                 placeholderTextColor={colores.gris}

@@ -42,7 +42,7 @@ export default function Tiempo({ ciudad, onUbicacion }) {
   const cargar = useCallback(() => {
     setEstado({ cargando: true });
     obtenerTiempo(lugar.latitud, lugar.longitud)
-      .then((t) => setEstado({ tiempo: t }))
+      .then((r) => setEstado({ tiempo: r }))
       .catch(() => setEstado({ error: true }));
   }, [lugar.latitud, lugar.longitud]);
 

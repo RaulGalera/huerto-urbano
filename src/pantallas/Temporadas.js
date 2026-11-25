@@ -10,11 +10,11 @@ export default function Temporadas() {
   const { datos } = useDatos();
   const { config } = useCuenta();
 
-  function balance(t) {
-    const ids = datos.siembras.filter((s) => s.temporadaId === t.id).map((s) => s.id);
+  function balance(tem) {
+    const ids = datos.siembras.filter((s) => s.temporadaId === tem.id).map((s) => s.id);
     const kilos = datos.cosechas.filter((c) => ids.includes(c.siembraId)).reduce((a, c) => a + (Number(c.kilos) || 0), 0);
     if (!ids.length) return null;
-    return ids.length + ' ' + t(ids.length === 1 ? 'siembra' : 'siembras') + ' - ' + numero(kilos) + ' kg - ' + euros(calcularBeneficio(datos, config, t).beneficio);
+    return ids.length + ' ' + t(ids.length === 1 ? 'siembra' : 'siembras') + ' - ' + numero(kilos) + ' kg - ' + euros(calcularBeneficio(datos, config, tem).beneficio);
   }
   const f = hoy();
   const campos = [
@@ -32,9 +32,9 @@ export default function Temporadas() {
       campos={campos}
       nuevo={() => ({ nombre: '', inicio: '', fin: '' })}
       items={ordenarPorFecha(datos.temporadas, 'inicio')}
-      renderTitulo={(t) => t.nombre}
-      renderTexto={(t) => [verFecha(t.inicio) + ' - ' + verFecha(t.fin), balance(t)]}
-      renderDato={(t) => (t.inicio <= f && f <= t.fin ? { texto: t('Actual'), color: colores.verde } : null)}
+      renderTitulo={(tem) => tem.nombre}
+      renderTexto={(tem) => [verFecha(tem.inicio) + ' - ' + verFecha(tem.fin), balance(tem)]}
+      renderDato={(tem) => (tem.inicio <= f && f <= tem.fin ? { texto: t('Actual'), color: colores.verde } : null)}
       avisoBorrar={t('Se borraran tambien las siembras y cosechas de esta temporada. Continuar?')}
     />
   );
