@@ -1,0 +1,73 @@
+import { useState } from 'react';
+import { Pressable, ScrollView, Text } from 'react-native';
+import ListaEditable from '../componentes/ListaEditable';
+import { hoy, useDatos } from '../datos';
+import { estiloChip } from '../estilos';
+import { nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
+
+export default function Siembras() {
+  const { datos } = useDatos();
+  const actual = temporadaActual(datos.temporadas, hoy());
+  const [filtroGuardado, setFiltro] = useState(null);
+  const filtro = filtroGuardado === 'todas' || datos.temporadas.some((t) => t.id === filtroGuardado) ? filtroGuardado : actual ? actual.id : 'todas';
+  const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
+
+  const campos = [
+    { clave: 'cultivo', etiqueta: 'Cultivo', tipo: 'texto', obligatorio: true, ejemplo: 'Ej: Tomate' },
+    { clave: 'parcelaId', etiqueta: 'Parcela', tipo: 'desplegable', obligatorio: true, opciones: datos.parcelas.map((p) => ({ valor: p.id, texto: p.nombre })) },
+    { clave: 'temporadaId', etiqueta: 'Temporada', tipo: 'desplegable', obligatorio: true, opciones: temporadas.map((t) => ({ valor: t.id, texto: t.nombre })) },
+    { clave: 'fecha', etiqueta: 'Fecha de siembra', tipo: 'fecha', obligatorio: true },
+    { clave: 'cantidad', etiqueta: 'Plantas o semillas', tipo: 'numero' },
+    { clave: 'notas', etiqueta: 'Notas', tipo: 'largo' },
+  ];
+
+  const filtros = [...temporadas.map((t) => ({ id: t.id, texto: t.nombre })), { id: 'todas', texto: 'Todas' }];
+  const items = ordenarPorFecha(filtro === 'todas' ? datos.siembras : datos.siembras.filter((s) => s.temporadaId === filtro));
+
+  function cosechado(id) {
+    const lista = datos.cosechas.filter((c) => c.siembraId === id);
+    if (!lista.length) return 'Sin cosechas';
+    const kilos = lista.reduce((a, c) => a + (Number(c.kilos) || 0), 0);
+    return lista.length + (lista.length === 1 ? ' cosecha - ' : ' cosechas - ') + numero(kilos) + ' kg';
+  }
+
+  const cabecera = (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginBottom: 14 }} contentContainerStyle={{ gap: 8 }}>
+      {filtros.map((f) => {
+        const e = estiloChip(f.id === filtro);
+        return (
+          <Pressable key={f.id} style={e.caja} onPress={() => setFiltro(f.id)}>
+            <Text style={e.texto}>{f.texto}</Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+
+  return (
+    <ListaEditable
+      tipo="siembras"
+      icono="leaf"
+      titulo="Siembras"
+      textoNuevo="Nueva siembra"
+      tituloEditar="Editar siembra"
+      campos={campos}
+      cabecera={cabecera}
+      nuevo={() => ({
+        cultivo: '',
+        parcelaId: datos.parcelas.length === 1 ? datos.parcelas[0].id : undefined,
+        temporadaId: filtro !== 'todas' ? filtro : actual ? actual.id : undefined,
+        fecha: hoy(),
+        cantidad: '',
+        notas: '',
+      })}
+      items={items}
+      renderTitulo={(s) => s.cultivo}
+      renderTexto={(s) => [
+        [nombrePor(datos.parcelas, s.parcelaId), verFecha(s.fecha), s.cantidad ? s.cantidad + ' plantas' : ''].filter(Boolean).join(' - '),
+        cosechado(s.id),
+      ]}
+      avisoBorrar="Se borraran tambien sus cosechas. Continuar?"
+    />
+  );
+}
