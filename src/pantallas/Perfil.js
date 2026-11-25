@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
 import { useCuenta } from '../cuenta';
@@ -7,13 +7,16 @@ import { useDatos } from '../datos';
 import { buscarCiudad, CIUDAD_POR_DEFECTO } from '../tiempo';
 import { ubicacionActual } from '../ubicacion';
 import Admin from './Admin';
+import { exportarCopia, importarCopia } from '../copia';
 
 export default function Perfil({ onCerrar }) {
   const { usuario, esAdmin, salir, cambiarContrasena } = useCuenta();
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');
   const [mensaje, setMensaje] = useState(null);
-  const { datos, guardarAjustes } = useDatos();
+  const { datos, guardarAjustes, reemplazar } = useDatos();
+  const [textoCopia, setTextoCopia] = useState('');
+  const [avisoCopia, setAvisoCopia] = useState(null);
   const ciudad = (datos.ajustes && datos.ajustes.ciudad) || null;
   const [busqueda, setBusqueda] = useState('');
   const [resultados, setResultados] = useState([]);
@@ -40,6 +43,50 @@ export default function Perfil({ onCerrar }) {
       setAvisoCiudad(lista.length ? '' : 'No se ha encontrado esa ciudad');
     } catch (e) {
       setAvisoCiudad('No se pudo buscar. Revisa la conexion.');
+    }
+  }
+
+  async function exportar() {
+    const texto = exportarCopia(datos);
+    const nombre = 'huerto-' + new Date().toISOString().slice(0, 10) + '.json';
+    if (Platform.OS === 'web') {
+      const url = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nombre;
+      a.click();
+      URL.revokeObjectURL(url);
+      setAvisoCopia({ texto: 'Copia descargada: ' + nombre, color: colores.verde });
+      return;
+    }
+    try {
+      await Share.share({ title: nombre, message: texto });
+    } catch (e) {
+      setAvisoCopia({ texto: 'No se pudo compartir la copia', color: colores.rojo });
+    }
+  }
+
+  function restaurar() {
+    let nuevos;
+    try {
+      nuevos = importarCopia(textoCopia);
+    } catch (e) {
+      setAvisoCopia({ texto: e.message, color: colores.rojo });
+      return;
+    }
+    const hacer = () => {
+      reemplazar(nuevos);
+      setTextoCopia('');
+      setAvisoCopia({ texto: 'Datos restaurados', color: colores.verde });
+    };
+    const pregunta = 'Se cambiaran tus datos actuales por los de la copia. Continuar?';
+    if (Platform.OS === 'web') {
+      if (window.confirm(pregunta)) hacer();
+    } else {
+      Alert.alert('Restaurar copia', pregunta, [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Restaurar', onPress: hacer },
+      ]);
     }
   }
 
@@ -121,6 +168,30 @@ export default function Perfil({ onCerrar }) {
               </Text>
             </Pressable>
           ))}
+        </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo}>Copia de seguridad</Text>
+          <Text style={estilos.tarjetaTexto}>Guarda tus temporadas, parcelas, siembras, riegos y cosechas para no perderlas.</Text>
+          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={exportar}>
+            <Ionicons name="download-outline" size={18} color={colores.verde} />
+            <Text style={estilos.botonSecundarioTexto}>Exportar mis datos</Text>
+          </Pressable>
+          <Text style={estilos.etiqueta}>Para restaurar, pega aqui el texto de la copia</Text>
+          <TextInput
+            style={[estilos.input, { height: 80, paddingTop: 10, textAlignVertical: 'top' }]}
+            value={textoCopia}
+            onChangeText={setTextoCopia}
+            multiline
+            autoCapitalize="none"
+            placeholder='{"app":"huerto-urbano", ...}'
+            placeholderTextColor={colores.gris}
+          />
+          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={restaurar}>
+            <Ionicons name="refresh-outline" size={18} color={colores.verde} />
+            <Text style={estilos.botonSecundarioTexto}>Restaurar copia</Text>
+          </Pressable>
+          {avisoCopia ? <Text style={{ color: avisoCopia.color, marginTop: 8 }}>{avisoCopia.texto}</Text> : null}
         </View>
 
         {esAdmin ? <Admin /> : null}
