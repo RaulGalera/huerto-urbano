@@ -6,6 +6,7 @@ import { hoy, useDatos } from '../datos';
 import { nombrePor, numero, ordenarPorFecha, temporadaActual, ultimoRiego } from '../util';
 import { useCuenta } from '../cuenta';
 import { calcularBeneficio, euros } from '../calculos';
+import Tiempo from '../componentes/Tiempo';
 import { estadoSiembra, nombreMes, paraSembrar } from '../cultivos';
 
 const DIAS_AVISO_RIEGO = 3;
@@ -123,6 +124,8 @@ export default function Resumen({ onPerfil }) {
           </View>
         </View>
       ) : null}
+
+      <Tiempo ciudad={datos.ajustes && datos.ajustes.ciudad} />
 
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 16 }}>
         <Dato valor={datos.parcelas.length} texto="Parcelas" />

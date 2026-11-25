@@ -1,0 +1,74 @@
+export const CIUDAD_POR_DEFECTO = { nombre: 'Madrid', latitud: 40.4168, longitud: -3.7038 };
+
+const CODIGOS = [
+  [0, 'Despejado', 'sunny-outline'],
+  [3, 'Nubes y claros', 'partly-sunny-outline'],
+  [48, 'Niebla', 'cloud-outline'],
+  [57, 'Llovizna', 'rainy-outline'],
+  [67, 'Lluvia', 'rainy-outline'],
+  [77, 'Nieve', 'snow-outline'],
+  [82, 'Chubascos', 'rainy-outline'],
+  [86, 'Nieve', 'snow-outline'],
+  [99, 'Tormenta', 'thunderstorm-outline'],
+];
+
+export function describirCodigo(codigo) {
+  const c = CODIGOS.find(([max]) => codigo <= max) || CODIGOS[CODIGOS.length - 1];
+  return { texto: c[1], icono: c[2] };
+}
+
+export async function buscarCiudad(nombre) {
+  const url = 'https://geocoding-api.open-meteo.com/v1/search?count=5&language=es&name=' + encodeURIComponent(nombre.trim());
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('No se pudo buscar la ciudad');
+  const j = await r.json();
+  return (j.results || []).map((x) => ({
+    nombre: x.name,
+    detalle: [x.admin1, x.country].filter(Boolean).join(', '),
+    latitud: x.latitude,
+    longitud: x.longitude,
+  }));
+}
+
+export async function obtenerTiempo(latitud, longitud) {
+  const url =
+    'https://api.open-meteo.com/v1/forecast?latitude=' +
+    latitud +
+    '&longitude=' +
+    longitud +
+    '&current=temperature_2m,weather_code' +
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max' +
+    '&timezone=auto&forecast_days=3';
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('No se pudo obtener el tiempo');
+  const j = await r.json();
+  return {
+    actual: { temperatura: j.current.temperature_2m, codigo: j.current.weather_code },
+    dias: j.daily.time.map((fecha, i) => ({
+      fecha,
+      codigo: j.daily.weather_code[i],
+      maxima: j.daily.temperature_2m_max[i],
+      minima: j.daily.temperature_2m_min[i],
+      lluvia: j.daily.precipitation_sum[i] || 0,
+      probabilidad: j.daily.precipitation_probability_max[i] || 0,
+    })),
+  };
+}
+
+export const LLUVIA_SUFICIENTE = 3;
+
+export function consejoRiego(dias) {
+  const proximos = dias.slice(0, 2);
+  const lluvia = proximos.reduce((a, d) => a + d.lluvia, 0);
+  const maxima = Math.max(...proximos.map((d) => d.maxima));
+  if (lluvia >= LLUVIA_SUFICIENTE) {
+    return { tipo: 'lluvia', texto: 'Van a caer unos ' + lluvia.toFixed(1).replace('.', ',') + ' mm en dos dias. Puedes saltarte el riego.' };
+  }
+  if (maxima >= 30) {
+    return { tipo: 'calor', texto: 'Hace calor. Riega a primera hora o al atardecer.' };
+  }
+  if (maxima <= 2) {
+    return { tipo: 'helada', texto: 'Puede helar. Protege los cultivos y riega poco.' };
+  }
+  return { tipo: 'normal', texto: 'No se espera lluvia. Sigue con el riego normal.' };
+}

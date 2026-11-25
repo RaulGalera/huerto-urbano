@@ -18,6 +18,7 @@ export const vacio = {
   siembras: [],
   riegos: [],
   cosechas: [],
+  ajustes: {},
 };
 
 const DatosContext = createContext(null);
@@ -53,8 +54,12 @@ export function DatosProvider({ usuarioId, migrar, children }) {
     if (cargado) AsyncStorage.setItem(claveDatos(usuarioId), JSON.stringify(datos));
   }, [datos, cargado, usuarioId]);
 
+  function guardarAjustes(cambios) {
+    setDatos((d) => ({ ...d, ajustes: { ...d.ajustes, ...cambios } }));
+  }
+
   function reemplazar(nuevos) {
-    setDatos({ ...vacio, ...nuevos });
+    setDatos((d) => ({ ...vacio, ...nuevos, ajustes: nuevos.ajustes || d.ajustes }));
   }
 
   function guardar(tipo, item) {
@@ -90,7 +95,7 @@ export function DatosProvider({ usuarioId, migrar, children }) {
   }
 
   return (
-    <DatosContext.Provider value={{ datos, guardar, borrar, reemplazar, cargado }}>
+    <DatosContext.Provider value={{ datos, guardar, borrar, reemplazar, guardarAjustes, cargado }}>
       {children}
     </DatosContext.Provider>
   );
