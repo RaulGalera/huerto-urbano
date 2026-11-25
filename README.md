@@ -6,7 +6,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
-![Tests](https://img.shields.io/badge/tests-36_pasan-2E7D32)
+![Tests](https://img.shields.io/badge/tests-47_pasan-2E7D32)
 ![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
 
 ## Indice
@@ -42,11 +42,12 @@ Pantalla de inicio
 - Tiempo de los proximos 3 dias con Open-Meteo y consejo de riego (lluvia, calor o helada).
 - Calendario del huerto: siembras listas para cosechar, proximas cosechas y que sembrar este mes.
 - Graficas: kilos por cultivo y por mes, agua por parcela y beneficio por temporada.
-- Beneficio de la temporada, total y por parcela.
+- Beneficio de la temporada, total y por parcela, descargable en PDF.
 
 Cuentas
 
 - Registro e inicio de sesion locales. Cada usuario ve solo sus datos.
+- Guia de bienvenida de tres pasos la primera vez que se entra.
 - Idioma elegible al registrarse (espanol por defecto o ingles) y cambiable despues.
 - Modo oscuro: como el movil, claro u oscuro.
 - Mi cuenta: cambiar nombre, contrasena, idioma y ubicacion, copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
@@ -68,7 +69,8 @@ Modo admin
 | Tiempo | API de Open-Meteo, modelo AROME de Meteo-France (gratis y sin clave) |
 | Ubicacion | expo-location |
 | Iconos | @expo/vector-icons (Ionicons) |
-| Tests | Jest con jest-expo |
+| PDF | expo-print y expo-sharing |
+| Tests | Jest con jest-expo y Testing Library |
 
 No usa librerias de navegacion: las pestanas y los modales estan hechos a mano para que la app sea ligera y facil de seguir.
 
@@ -105,7 +107,7 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 npm test
 ```
 
-36 tests en `__tests__/` que cubren: calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
+47 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, login y registro) con Testing Library, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
 
 ## Arquitectura
 

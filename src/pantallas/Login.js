@@ -14,6 +14,7 @@ function Campo({ etiqueta, valor, onCambio, secreto, ejemplo }) {
       <Text style={estilos.etiqueta}>{etiqueta}</Text>
       <TextInput
         style={estilos.input}
+        accessibilityLabel={etiqueta}
         value={valor}
         onChangeText={onCambio}
         secureTextEntry={secreto}

@@ -8,6 +8,8 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.26",
     "expo-location": "~58.0.22",
+    "expo-print": "~58.0.9",
+    "expo-sharing": "~58.0.23",
     "expo-status-bar": "~58.0.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -23,10 +25,12 @@
   },
   "private": true,
   "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
     "jest": "^30.5.2",
     "jest-expo": "~58.0.15"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "testTimeout": 20000
   }
 }
