@@ -19,7 +19,7 @@ function Desplegable({ opciones, valor, onCambio }) {
         <Ionicons name={abierto ? 'chevron-up' : 'chevron-down'} size={18} color={colores.gris} />
       </Pressable>
       {abierto ? (
-        <View style={{ backgroundColor: colores.blanco, borderWidth: 1, borderColor: colores.borde, borderRadius: 8, marginTop: 4 }}>
+        <View style={{ backgroundColor: colores.superficie, borderWidth: 1, borderColor: colores.borde, borderRadius: 8, marginTop: 4 }}>
           {opciones.map((o) => (
             <Pressable
               key={o.valor}

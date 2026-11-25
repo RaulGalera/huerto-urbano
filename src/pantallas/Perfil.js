@@ -13,7 +13,7 @@ import Chips from '../componentes/Chips';
 import Legal from './Legal';
 
 export default function Perfil({ onCerrar }) {
-  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarNombre, borrarMiCuenta } = useCuenta();
+  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarNombre, borrarMiCuenta } = useCuenta();
   const [nombre, setNombre] = useState(usuario.nombre);
   const [avisoNombre, setAvisoNombre] = useState(null);
   const [claveBorrar, setClaveBorrar] = useState('');
@@ -159,6 +159,22 @@ export default function Perfil({ onCerrar }) {
           <Text style={estilos.tarjetaTitulo}>{t('Idioma de la app')}</Text>
           <View style={{ marginTop: 10 }}>
             <Chips opciones={IDIOMAS} valor={usuario.idioma || 'es'} onCambiar={(i) => cambiarIdioma(usuario.id, i)} abajo={0} />
+          </View>
+        </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo}>{t('Apariencia')}</Text>
+          <View style={{ marginTop: 10 }}>
+            <Chips
+              opciones={[
+                { id: 'sistema', texto: t('Como el movil') },
+                { id: 'claro', texto: t('Claro') },
+                { id: 'oscuro', texto: t('Oscuro') },
+              ]}
+              valor={usuario.tema || 'sistema'}
+              onCambiar={(v) => cambiarTema(usuario.id, v)}
+              abajo={0}
+            />
           </View>
         </View>
 

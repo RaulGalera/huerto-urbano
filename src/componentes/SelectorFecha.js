@@ -34,8 +34,8 @@ function Calendario({ inicial, onElegir, onCerrar }) {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onCerrar}>
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'center', padding: 20 }} onPress={onCerrar}>
-        <Pressable style={{ backgroundColor: colores.blanco, borderRadius: 14, padding: 16, width: '100%', maxWidth: 380, alignSelf: 'center' }} onPress={() => {}}>
+      <Pressable style={{ flex: 1, backgroundColor: colores.sombra, justifyContent: 'center', padding: 20 }} onPress={onCerrar}>
+        <Pressable style={{ backgroundColor: colores.superficie, borderRadius: 14, padding: 16, width: '100%', maxWidth: 380, alignSelf: 'center' }} onPress={() => {}}>
           <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 12 }]}>
             <Pressable onPress={() => mover(-1)} hitSlop={10} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel={t('Mes anterior')}>
               <Ionicons name="chevron-back" size={22} color={colores.verde} />
