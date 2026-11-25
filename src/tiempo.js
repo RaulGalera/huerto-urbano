@@ -30,29 +30,59 @@ export async function buscarCiudad(nombre) {
   }));
 }
 
-export async function obtenerTiempo(latitud, longitud) {
-  const url =
+function urlPrevision(latitud, longitud, modelo) {
+  return (
     'https://api.open-meteo.com/v1/forecast?latitude=' +
     latitud +
     '&longitude=' +
     longitud +
     '&current=temperature_2m,weather_code' +
     '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max' +
-    '&timezone=auto&forecast_days=3';
+    '&timezone=auto&forecast_days=3' +
+    (modelo ? '&models=' + modelo : '')
+  );
+}
+
+async function pedir(url) {
   const r = await fetch(url);
   if (!r.ok) throw new Error('No se pudo obtener el tiempo');
-  const j = await r.json();
+  return r.json();
+}
+
+function valor(lista, i, otro) {
+  const v = lista && lista[i];
+  return v === null || v === undefined ? otro : v;
+}
+
+export function combinarPrevision(precisa, general) {
+  const base = precisa || general;
+  const respaldo = general || precisa;
+  const dias = base.daily.time.map((fecha, i) => ({
+    fecha,
+    codigo: valor(base.daily.weather_code, i, valor(respaldo.daily.weather_code, i, 0)),
+    maxima: valor(base.daily.temperature_2m_max, i, valor(respaldo.daily.temperature_2m_max, i, 0)),
+    minima: valor(base.daily.temperature_2m_min, i, valor(respaldo.daily.temperature_2m_min, i, 0)),
+    lluvia: valor(base.daily.precipitation_sum, i, valor(respaldo.daily.precipitation_sum, i, 0)),
+    probabilidad: valor(respaldo.daily.precipitation_probability_max, i, null),
+  }));
   return {
-    actual: { temperatura: j.current.temperature_2m, codigo: j.current.weather_code },
-    dias: j.daily.time.map((fecha, i) => ({
-      fecha,
-      codigo: j.daily.weather_code[i],
-      maxima: j.daily.temperature_2m_max[i],
-      minima: j.daily.temperature_2m_min[i],
-      lluvia: j.daily.precipitation_sum[i] || 0,
-      probabilidad: j.daily.precipitation_probability_max[i] || 0,
-    })),
+    actual: {
+      temperatura: valor([base.current.temperature_2m], 0, respaldo.current.temperature_2m),
+      codigo: valor([base.current.weather_code], 0, respaldo.current.weather_code),
+    },
+    dias,
+    modelo: precisa ? 'AROME (Meteo-France)' : 'Open-Meteo',
   };
+}
+
+export async function obtenerTiempo(latitud, longitud) {
+  const [precisa, general] = await Promise.all([
+    pedir(urlPrevision(latitud, longitud, 'meteofrance_seamless')).catch(() => null),
+    pedir(urlPrevision(latitud, longitud)).catch(() => null),
+  ]);
+  if (!precisa && !general) throw new Error('No se pudo obtener el tiempo');
+  const valida = precisa && precisa.daily && precisa.daily.temperature_2m_max && precisa.daily.temperature_2m_max[0] !== null ? precisa : null;
+  return combinarPrevision(valida, general);
 }
 
 export const LLUVIA_SUFICIENTE = 3;

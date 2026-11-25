@@ -45,7 +45,7 @@ El calculo esta en src/calculos.js.
 - Temporadas: nombre y fechas de inicio y fin.
 
 Las fechas se eligen con un calendario y se muestran como DD/MM/AAAA. Para editar o borrar un registro, se pulsa sobre su tarjeta.
-La ciudad del huerto se elige en Mi cuenta y se usa para el tiempo.
+La ubicacion del huerto se toma del GPS del movil, o se elige una ciudad en Mi cuenta.
 
 Los datos se guardan en el propio dispositivo con AsyncStorage (en web, en el almacenamiento del navegador).
 
@@ -57,6 +57,7 @@ Los datos se guardan en el propio dispositivo con AsyncStorage (en web, en el al
 - src/calculos.js: calculo del beneficio.
 - src/precios.js: precios de mercado por defecto.
 - src/cultivos.js: dias hasta la cosecha y meses de siembra de cada cultivo.
-- src/tiempo.js: prevision del tiempo y consejo de riego con Open-Meteo (gratis y sin clave).
+- src/tiempo.js: prevision del tiempo y consejo de riego con Open-Meteo (gratis y sin clave). Usa el modelo AROME de Meteo-France (1,3 km) y la probabilidad de lluvia del modelo general.
+- src/ubicacion.js: ubicacion del movil por GPS con expo-location.
 - src/componentes: lista editable y formulario reutilizables.
 - src/pantallas: una pantalla por cada apartado, mas Login, Perfil y Admin.

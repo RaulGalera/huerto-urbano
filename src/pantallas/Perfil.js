@@ -5,6 +5,7 @@ import { colores, estilos } from '../estilos';
 import { useCuenta } from '../cuenta';
 import { useDatos } from '../datos';
 import { buscarCiudad, CIUDAD_POR_DEFECTO } from '../tiempo';
+import { ubicacionActual } from '../ubicacion';
 import Admin from './Admin';
 
 export default function Perfil({ onCerrar }) {
@@ -17,6 +18,18 @@ export default function Perfil({ onCerrar }) {
   const [busqueda, setBusqueda] = useState('');
   const [resultados, setResultados] = useState([]);
   const [avisoCiudad, setAvisoCiudad] = useState('');
+
+  async function usarGps() {
+    setAvisoCiudad('Buscando tu ubicacion...');
+    try {
+      const u = await ubicacionActual();
+      guardarAjustes({ ciudad: u });
+      setResultados([]);
+      setAvisoCiudad('Ubicacion guardada: ' + u.nombre);
+    } catch (e) {
+      setAvisoCiudad('No se pudo usar el GPS. Revisa el permiso de ubicacion.');
+    }
+  }
 
   async function buscar() {
     if (busqueda.trim().length < 2) return;
@@ -71,7 +84,7 @@ export default function Perfil({ onCerrar }) {
         <View style={estilos.tarjeta}>
           <Text style={estilos.tarjetaTitulo}>Ubicacion del huerto</Text>
           <Text style={estilos.tarjetaTexto}>
-            Se usa para el tiempo y la lluvia. Ahora: {ciudad ? ciudad.nombre : CIUDAD_POR_DEFECTO.nombre + ' (por defecto)'}
+            Se usa para el tiempo y la lluvia. Ahora: {ciudad ? ciudad.nombre + (ciudad.gps ? ' (GPS)' : '') : CIUDAD_POR_DEFECTO.nombre + ' (por defecto)'}
           </Text>
           <View style={[estilos.fila, { gap: 8, marginTop: 10 }]}>
             <TextInput
@@ -86,6 +99,10 @@ export default function Perfil({ onCerrar }) {
               <Ionicons name="search" size={20} color={colores.blanco} />
             </Pressable>
           </View>
+          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={usarGps}>
+            <Ionicons name="navigate-outline" size={18} color={colores.verde} />
+            <Text style={estilos.botonSecundarioTexto}>Usar mi ubicacion (GPS)</Text>
+          </Pressable>
           {avisoCiudad ? <Text style={[estilos.tarjetaTexto, { marginTop: 8 }]}>{avisoCiudad}</Text> : null}
           {resultados.map((c) => (
             <Pressable

@@ -20,6 +20,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "La app usa tu ubicacion para mostrar el tiempo de tu huerto."
+        }
+      ]
+    ]
   }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estiloChip, estilos } from '../estilos';
@@ -30,7 +30,8 @@ function Linea({ texto, valor, color, negrita }) {
 }
 
 export default function Resumen({ onPerfil }) {
-  const { datos, guardar } = useDatos();
+  const { datos, guardar, guardarAjustes } = useDatos();
+  const guardarUbicacion = useCallback((ciudad) => guardarAjustes({ ciudad }), [guardarAjustes]);
   const { usuario, config, esAdmin } = useCuenta();
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
   const actual = temporadaActual(temporadas, hoy());
@@ -125,7 +126,7 @@ export default function Resumen({ onPerfil }) {
         </View>
       ) : null}
 
-      <Tiempo ciudad={datos.ajustes && datos.ajustes.ciudad} />
+      <Tiempo ciudad={datos.ajustes && datos.ajustes.ciudad} onUbicacion={guardarUbicacion} />
 
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 16 }}>
         <Dato valor={datos.parcelas.length} texto="Parcelas" />
