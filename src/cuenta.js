@@ -72,13 +72,13 @@ export function CuentaProvider({ children }) {
     return null;
   }
 
-  function registrar(nombre, usuario, contrasena) {
+  function registrar(nombre, usuario, contrasena, idioma = 'es') {
     const limpio = usuario.trim();
     if (!nombre.trim() || !limpio || !contrasena) return 'Rellena todos los campos';
     if (!/^[a-zA-Z0-9_.-]{3,20}$/.test(limpio)) return 'El usuario debe tener de 3 a 20 letras o numeros, sin espacios';
     if (contrasena.length < 6) return 'La contrasena debe tener al menos 6 caracteres';
     if (usuarios.some((x) => x.usuario.toLowerCase() === limpio.toLowerCase())) return 'Ese usuario ya existe';
-    const nuevo = { id: idNuevo(), usuario: limpio, nombre: nombre.trim(), clave: cifrar(limpio, contrasena), rol: 'usuario', creado: new Date().toISOString() };
+    const nuevo = { id: idNuevo(), usuario: limpio, nombre: nombre.trim(), clave: cifrar(limpio, contrasena), rol: 'usuario', idioma, creado: new Date().toISOString() };
     guardarUsuarios([...usuarios, nuevo]);
     setSesion(nuevo.id);
     AsyncStorage.setItem(CLAVE_SESION, nuevo.id);
@@ -96,6 +96,10 @@ export function CuentaProvider({ children }) {
     if (nueva.length < 6) return 'La contrasena nueva debe tener al menos 6 caracteres';
     guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, clave: cifrar(x.usuario, nueva) } : x)));
     return null;
+  }
+
+  function cambiarIdioma(id, idioma) {
+    guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, idioma } : x)));
   }
 
   function cambiarRol(id, rol) {
@@ -121,7 +125,7 @@ export function CuentaProvider({ children }) {
 
   return (
     <CuentaContext.Provider
-      value={{ usuarios, usuario, esAdmin: usuario ? usuario.rol === 'admin' : false, config, cargado, entrar, registrar, salir, cambiarContrasena, cambiarRol, borrarUsuario, guardarConfig }}
+      value={{ usuarios, usuario, esAdmin: usuario ? usuario.rol === 'admin' : false, config, cargado, entrar, registrar, salir, cambiarContrasena, cambiarIdioma, cambiarRol, borrarUsuario, guardarConfig }}
     >
       {children}
     </CuentaContext.Provider>

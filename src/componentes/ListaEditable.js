@@ -5,15 +5,16 @@ import { colores, estilos } from '../estilos';
 import { useDatos } from '../datos';
 import Formulario from './Formulario';
 import { filtrar } from '../copia';
+import { t } from '../idioma';
 
 function confirmar(mensaje, accion) {
   if (Platform.OS === 'web') {
     if (window.confirm(mensaje)) accion();
     return;
   }
-  Alert.alert('Confirmar', mensaje, [
-    { text: 'Cancelar', style: 'cancel' },
-    { text: 'Borrar', style: 'destructive', onPress: accion },
+  Alert.alert(t('Confirmar'), mensaje, [
+    { text: t('Cancelar'), style: 'cancel' },
+    { text: t('Borrar'), style: 'destructive', onPress: accion },
   ]);
 }
 
@@ -34,7 +35,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
             style={{ flex: 1, height: 42, fontSize: 15, color: colores.texto, outlineStyle: 'none' }}
             value={busqueda}
             onChangeText={setBusqueda}
-            placeholder="Buscar"
+            placeholder={t('Buscar')}
             placeholderTextColor={colores.gris}
           />
           {busqueda ? (
@@ -51,7 +52,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 40 }}>
             <Ionicons name={(icono || 'leaf') + '-outline'} size={48} color={colores.borde} />
-            <Text style={[estilos.vacio, { marginTop: 10 }]}>{items.length ? 'No hay resultados para esa busqueda.' : 'Todavia no hay nada. Pulsa el boton de abajo.'}</Text>
+            <Text style={[estilos.vacio, { marginTop: 10 }]}>{t(items.length ? 'No hay resultados para esa busqueda.' : 'Todavia no hay nada. Pulsa el boton de abajo.')}</Text>
           </View>
         }
         renderItem={({ item }) => {
@@ -88,7 +89,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
           onBorrar={
             editando.id
               ? () =>
-                  confirmar(avisoBorrar || 'Seguro que quieres borrarlo?', () => {
+                  confirmar(avisoBorrar || t('Seguro que quieres borrarlo?'), () => {
                     borrar(tipo, editando.id);
                     setEditando(null);
                   })

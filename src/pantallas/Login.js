@@ -3,6 +3,8 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput,
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
 import { useCuenta } from '../cuenta';
+import Chips from '../componentes/Chips';
+import { IDIOMAS, idioma, ponerIdioma, t } from '../idioma';
 
 function Campo({ etiqueta, valor, onCambio, secreto, ejemplo }) {
   return (
@@ -30,6 +32,12 @@ export default function Login() {
   const [contrasena, setContrasena] = useState('');
   const [repetir, setRepetir] = useState('');
   const [error, setError] = useState('');
+  const [idiomaElegido, setIdiomaElegido] = useState(idioma());
+
+  function elegirIdioma(i) {
+    ponerIdioma(i);
+    setIdiomaElegido(i);
+  }
 
   function enviar() {
     if (modo === 'entrar') {
@@ -37,10 +45,10 @@ export default function Login() {
       return;
     }
     if (contrasena !== repetir) {
-      setError('Las contrasenas no coinciden');
+      setError(t('Las contrasenas no coinciden'));
       return;
     }
-    setError(registrar(nombre, usuario, contrasena) || '');
+    setError(registrar(nombre, usuario, contrasena, idiomaElegido) || '');
   }
 
   function cambiarModo() {
@@ -56,22 +64,28 @@ export default function Login() {
             <Ionicons name="leaf" size={42} color={colores.verde} />
           </View>
           <Text style={[estilos.titulo, { marginTop: 14, marginBottom: 4 }]}>Huerto Urbano</Text>
-          <Text style={estilos.tarjetaTexto}>{modo === 'entrar' ? 'Inicia sesion para ver tu huerto' : 'Crea tu cuenta'}</Text>
+          <Text style={estilos.tarjetaTexto}>{t(modo === 'entrar' ? 'Inicia sesion para ver tu huerto' : 'Crea tu cuenta')}</Text>
         </View>
 
-        {modo === 'registro' ? <Campo etiqueta="Nombre" valor={nombre} onCambio={setNombre} ejemplo="Ej: Raul" /> : null}
-        <Campo etiqueta="Usuario" valor={usuario} onCambio={setUsuario} ejemplo="Ej: raul" />
-        <Campo etiqueta="Contrasena" valor={contrasena} onCambio={setContrasena} secreto />
-        {modo === 'registro' ? <Campo etiqueta="Repetir contrasena" valor={repetir} onCambio={setRepetir} secreto /> : null}
+        {modo === 'registro' ? <Campo etiqueta={t('Nombre')} valor={nombre} onCambio={setNombre} ejemplo={t('Ej: Raul')} /> : null}
+        <Campo etiqueta={t('Usuario')} valor={usuario} onCambio={setUsuario} ejemplo={t('Ej: raul')} />
+        <Campo etiqueta={t('Contrasena')} valor={contrasena} onCambio={setContrasena} secreto />
+        {modo === 'registro' ? <Campo etiqueta={t('Repetir contrasena')} valor={repetir} onCambio={setRepetir} secreto /> : null}
+        {modo === 'registro' ? (
+          <View>
+            <Text style={estilos.etiqueta}>{t('Idioma de la app')}</Text>
+            <Chips opciones={IDIOMAS} valor={idiomaElegido} onCambiar={elegirIdioma} abajo={0} />
+          </View>
+        ) : null}
 
-        {error ? <Text style={{ color: colores.rojo, marginTop: 14 }}>{error}</Text> : null}
+        {error ? <Text style={{ color: colores.rojo, marginTop: 14 }}>{t(error)}</Text> : null}
 
         <Pressable style={[estilos.boton, { marginTop: 24 }]} onPress={enviar}>
-          <Text style={estilos.botonTexto}>{modo === 'entrar' ? 'Entrar' : 'Crear cuenta'}</Text>
+          <Text style={estilos.botonTexto}>{t(modo === 'entrar' ? 'Entrar' : 'Crear cuenta')}</Text>
         </Pressable>
         <Pressable style={{ marginTop: 18, alignItems: 'center', padding: 6 }} onPress={cambiarModo}>
           <Text style={{ color: colores.verde, fontWeight: '600' }}>
-            {modo === 'entrar' ? 'No tengo cuenta, quiero registrarme' : 'Ya tengo cuenta, quiero entrar'}
+            {t(modo === 'entrar' ? 'No tengo cuenta, quiero registrarme' : 'Ya tengo cuenta, quiero entrar')}
           </Text>
         </Pressable>
       </ScrollView>

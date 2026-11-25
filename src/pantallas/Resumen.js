@@ -8,6 +8,7 @@ import { useCuenta } from '../cuenta';
 import { calcularBeneficio, euros } from '../calculos';
 import Tiempo from '../componentes/Tiempo';
 import { estadoSiembra, nombreMes, paraSembrar } from '../cultivos';
+import { t } from '../idioma';
 
 const DIAS_AVISO_RIEGO = 3;
 
@@ -72,8 +73,8 @@ export default function Resumen({ onPerfil }) {
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 30 }}>
       <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 12 }]}>
         <View>
-          <Text style={[estilos.titulo, { marginBottom: 0 }]}>Mi huerto</Text>
-          <Text style={estilos.tarjetaTexto}>Hola, {usuario ? usuario.nombre : ''}</Text>
+          <Text style={[estilos.titulo, { marginBottom: 0 }]}>{t('Mi huerto')}</Text>
+          <Text style={estilos.tarjetaTexto}>{t('Hola,')} {usuario ? usuario.nombre : ''}</Text>
         </View>
         <Pressable onPress={onPerfil} hitSlop={10} style={[estilos.fila, { gap: 4 }]}>
           {esAdmin ? (
@@ -85,9 +86,9 @@ export default function Resumen({ onPerfil }) {
         </Pressable>
       </View>
 
-      <Text style={[estilos.etiqueta, { marginTop: 0 }]}>Temporada</Text>
+      <Text style={[estilos.etiqueta, { marginTop: 0 }]}>{t('Temporada')}</Text>
       {temporadas.length === 0 ? (
-        <Text style={estilos.tarjetaTexto}>Crea una temporada en la pestana Temp. para ver el resumen.</Text>
+        <Text style={estilos.tarjetaTexto}>{t('Crea una temporada en la pestana Temp. para ver el resumen.')}</Text>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {temporadas.map((t) => {
@@ -106,19 +107,19 @@ export default function Resumen({ onPerfil }) {
           <Ionicons name="alert-circle" size={22} color={colores.rojo} style={{ marginRight: 12 }} />
           <View style={{ flex: 1 }}>
             <Text style={{ color: colores.rojo, fontWeight: '600', fontSize: 14, marginBottom: 6 }}>
-              Parcelas sin regar ({DIAS_AVISO_RIEGO} dias o mas)
+              {t('Parcelas sin regar')} ({DIAS_AVISO_RIEGO} {t('dias o mas')})
             </Text>
             {avisos.map((a) => (
               <View key={a.parcela.id} style={[estilos.fila, { justifyContent: 'space-between', marginTop: 6 }]}>
                 <Text style={{ color: colores.texto, fontSize: 14, flex: 1 }}>
-                  {a.parcela.nombre} - {a.dias === null ? 'nunca regada' : a.dias + ' dias sin riego'}
+                  {a.parcela.nombre} - {a.dias === null ? t('nunca regada') : a.dias + ' ' + t('dias sin riego')}
                 </Text>
                 <Pressable
                   onPress={() => guardar('riegos', { parcelaId: a.parcela.id, fecha: hoy(), litros: '', metodo: 'Manguera' })}
                   style={[estilos.fila, { gap: 4, backgroundColor: colores.blanco, borderRadius: 14, paddingVertical: 4, paddingHorizontal: 10, borderWidth: 1, borderColor: colores.borde }]}
                 >
                   <Ionicons name="water" size={14} color={colores.verde} />
-                  <Text style={{ color: colores.verde, fontSize: 12, fontWeight: '600' }}>Regar hoy</Text>
+                  <Text style={{ color: colores.verde, fontSize: 12, fontWeight: '600' }}>{t('Regar hoy')}</Text>
                 </Pressable>
               </View>
             ))}
@@ -129,44 +130,44 @@ export default function Resumen({ onPerfil }) {
       <Tiempo ciudad={datos.ajustes && datos.ajustes.ciudad} onUbicacion={guardarUbicacion} />
 
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 16 }}>
-        <Dato valor={datos.parcelas.length} texto="Parcelas" />
-        <Dato valor={siembras.length} texto="Siembras" />
-        <Dato valor={numero(totalKilos)} texto="Kilos totales" />
+        <Dato valor={datos.parcelas.length} texto={t('Parcelas')} />
+        <Dato valor={siembras.length} texto={t('Siembras')} />
+        <Dato valor={numero(totalKilos)} texto={t('Kilos totales')} />
       </View>
 
       <View style={[estilos.tarjeta, { marginTop: 16 }]}>
         <View style={[estilos.fila, { gap: 8, marginBottom: 4 }]}>
           <Ionicons name="calendar-outline" size={20} color={colores.verde} />
-          <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }}>Calendario del huerto</Text>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }}>{t('Calendario del huerto')}</Text>
         </View>
         {listas.length > 0 ? (
           listas.map((s) => (
             <View key={s.id} style={[estilos.fila, { gap: 6, marginTop: 8 }]}>
               <Ionicons name="checkmark-circle" size={18} color={colores.verde} />
               <Text style={{ color: colores.texto, fontSize: 14 }}>
-                {s.cultivo} ({nombrePor(datos.parcelas, s.parcelaId)}) lista para cosechar
+                {s.cultivo} ({nombrePor(datos.parcelas, s.parcelaId)}) {t('lista para cosechar')}
               </Text>
             </View>
           ))
         ) : (
-          <Text style={estilos.tarjetaTexto}>Ninguna siembra pendiente de cosechar.</Text>
+          <Text style={estilos.tarjetaTexto}>{t('Ninguna siembra pendiente de cosechar.')}</Text>
         )}
         {proximas.map((x) => (
           <View key={x.s.id} style={[estilos.fila, { gap: 6, marginTop: 8 }]}>
             <Ionicons name="time-outline" size={18} color={colores.naranja} />
             <Text style={{ color: colores.texto, fontSize: 14 }}>
-              {x.s.cultivo} en {x.e.faltan} {x.e.faltan === 1 ? 'dia' : 'dias'}
+              {x.s.cultivo} {t('en')} {x.e.faltan} {t(x.e.faltan === 1 ? 'dia' : 'dias')}
             </Text>
           </View>
         ))}
-        <Text style={[estilos.etiqueta, { marginTop: 14 }]}>Para sembrar en {nombreMes(mes)}</Text>
+        <Text style={[estilos.etiqueta, { marginTop: 14 }]}>{t('Para sembrar en')} {t(nombreMes(mes))}</Text>
         <Text style={{ color: colores.texto, fontSize: 14, textTransform: 'capitalize' }}>{sembrarAhora.join(', ')}</Text>
       </View>
 
       <View style={[estilos.tarjeta, { paddingBottom: 20 }]}>
-        <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto, marginBottom: 8 }}>Kilos por cultivo</Text>
+        <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto, marginBottom: 8 }}>{t('Kilos por cultivo')}</Text>
         {ranking.length === 0 ? (
-          <Text style={estilos.tarjetaTexto}>Aun no hay cosechas en esta temporada.</Text>
+          <Text style={estilos.tarjetaTexto}>{t('Aun no hay cosechas en esta temporada.')}</Text>
         ) : (
           ranking.map((r) => (
             <View key={r.nombre} style={[estilos.fila, { marginTop: 14 }]}>
@@ -184,19 +185,19 @@ export default function Resumen({ onPerfil }) {
         <View style={[estilos.tarjeta, { paddingBottom: 18 }]}>
           <View style={[estilos.fila, { gap: 8, marginBottom: 4 }]}>
             <Ionicons name="cash-outline" size={20} color={colores.verde} />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }}>Beneficio de la temporada</Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }}>{t('Beneficio de la temporada')}</Text>
           </View>
-          <Linea texto="Venta a precio de mercado" valor={euros(cuentas.ingresos)} color={colores.verde} />
-          <Linea texto={'Agua (' + numero(cuentas.litros, 0) + ' L)'} valor={euros(-cuentas.agua)} color={colores.rojo} />
-          <Linea texto="Gastos de las parcelas" valor={euros(-cuentas.gastos)} color={colores.rojo} />
+          <Linea texto={t('Venta a precio de mercado')} valor={euros(cuentas.ingresos)} color={colores.verde} />
+          <Linea texto={t('Agua') + ' (' + numero(cuentas.litros, 0) + ' L)'} valor={euros(-cuentas.agua)} color={colores.rojo} />
+          <Linea texto={t('Gastos de las parcelas')} valor={euros(-cuentas.gastos)} color={colores.rojo} />
           {cuentas.impuestos > 0 ? (
-            <Linea texto={'Impuestos (' + numero(config.impuestos, 0) + '%)'} valor={euros(-cuentas.impuestos)} color={colores.rojo} />
+            <Linea texto={t('Impuestos') + ' (' + numero(config.impuestos, 0) + '%)'} valor={euros(-cuentas.impuestos)} color={colores.rojo} />
           ) : null}
           <View style={{ height: 1, backgroundColor: colores.borde, marginTop: 10 }} />
-          <Linea texto="Beneficio" valor={euros(cuentas.beneficio)} color={cuentas.beneficio >= 0 ? colores.verde : colores.rojo} negrita />
+          <Linea texto={t('Beneficio')} valor={euros(cuentas.beneficio)} color={cuentas.beneficio >= 0 ? colores.verde : colores.rojo} negrita />
           {cuentas.porParcela.length > 0 ? (
             <View style={{ marginTop: 14 }}>
-              <Text style={[estilos.etiqueta, { marginTop: 0 }]}>Por parcela</Text>
+              <Text style={[estilos.etiqueta, { marginTop: 0 }]}>{t('Por parcela')}</Text>
               {cuentas.porParcela.map((x) => (
                 <Linea key={x.parcela.id} texto={x.parcela.nombre} valor={euros(x.beneficio)} color={x.beneficio >= 0 ? colores.verde : colores.rojo} />
               ))}
@@ -204,7 +205,7 @@ export default function Resumen({ onPerfil }) {
           ) : null}
           {cuentas.sinPrecio.length > 0 ? (
             <Text style={[estilos.tarjetaTexto, { color: colores.naranja, marginTop: 12 }]}>
-              Sin precio de mercado: {cuentas.sinPrecio.join(', ')}. {esAdmin ? 'Anadelo en el modo admin.' : 'Pide al administrador que lo anada.'}
+              {t('Sin precio de mercado:')} {cuentas.sinPrecio.join(', ')}. {t(esAdmin ? 'Anadelo en el modo admin.' : 'Pide al administrador que lo anada.')}
             </Text>
           ) : null}
         </View>

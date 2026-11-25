@@ -3,9 +3,10 @@ import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
 import { diasDelMes, leerFecha, verFecha } from '../util';
+import { idioma, t } from '../idioma';
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-const SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const SEMANA = { es: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'] };
 
 function hoyIso() {
   return new Date().toISOString().slice(0, 10);
@@ -40,15 +41,15 @@ function Calendario({ inicial, onElegir, onCerrar }) {
               <Ionicons name="chevron-back" size={22} color={colores.verde} />
             </Pressable>
             <Text style={{ fontSize: 16, fontWeight: '700', color: colores.texto }}>
-              {MESES[mes]} {anio}
+              {t(MESES[mes])} {anio}
             </Text>
             <Pressable onPress={() => mover(1)} hitSlop={10} style={{ padding: 4 }}>
               <Ionicons name="chevron-forward" size={22} color={colores.verde} />
             </Pressable>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            {SEMANA.map((d) => (
-              <Text key={d} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: colores.gris, marginBottom: 6 }}>
+            {SEMANA[idioma()].map((d, i) => (
+              <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: colores.gris, marginBottom: 6 }}>
                 {d}
               </Text>
             ))}
@@ -83,10 +84,10 @@ function Calendario({ inicial, onElegir, onCerrar }) {
           ))}
           <View style={[estilos.fila, { justifyContent: 'space-between', marginTop: 12 }]}>
             <Pressable onPress={() => onElegir(hoy)} style={{ padding: 8 }}>
-              <Text style={{ color: colores.verde, fontWeight: '600' }}>Hoy</Text>
+              <Text style={{ color: colores.verde, fontWeight: '600' }}>{t('Hoy')}</Text>
             </Pressable>
             <Pressable onPress={onCerrar} style={{ padding: 8 }}>
-              <Text style={{ color: colores.gris, fontWeight: '600' }}>Cerrar</Text>
+              <Text style={{ color: colores.gris, fontWeight: '600' }}>{t('Cerrar')}</Text>
             </Pressable>
           </View>
         </Pressable>
@@ -101,7 +102,7 @@ export default function SelectorFecha({ valor, onCambio }) {
   return (
     <View>
       <Pressable style={[estilos.input, estilos.fila, { justifyContent: 'space-between' }]} onPress={() => setAbierto(true)}>
-        <Text style={{ fontSize: 15, color: valor ? colores.texto : colores.gris }}>{valor || 'Elegir fecha'}</Text>
+        <Text style={{ fontSize: 15, color: valor ? colores.texto : colores.gris }}>{valor || t('Elegir fecha')}</Text>
         <Ionicons name="calendar-outline" size={20} color={colores.verde} />
       </Pressable>
       {abierto ? (

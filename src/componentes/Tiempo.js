@@ -4,13 +4,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
 import { CIUDAD_POR_DEFECTO, consejoRiego, describirCodigo, obtenerTiempo } from '../tiempo';
 import { ubicacionActual } from '../ubicacion';
+import { t } from '../idioma';
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
 
 function nombreDia(fecha, i) {
-  if (i === 0) return 'Hoy';
-  if (i === 1) return 'Manana';
-  return DIAS[new Date(fecha + 'T12:00:00').getDay()];
+  if (i === 0) return t('Hoy');
+  if (i === 1) return t('Manana');
+  return t(DIAS[new Date(fecha + 'T12:00:00').getDay()]);
+}
+
+function textoConsejo(c) {
+  if (c.tipo === 'lluvia') return t('Van a caer unos') + ' ' + c.mm + ' ' + t('mm en dos dias. Puedes saltarte el riego.');
+  return t(c.texto);
 }
 
 function redondear(n) {
@@ -50,17 +56,17 @@ export default function Tiempo({ ciudad, onUbicacion }) {
         <View style={[estilos.fila, { gap: 8, flex: 1 }]}>
           <Ionicons name="partly-sunny-outline" size={20} color={colores.verde} />
           <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }} numberOfLines={1}>
-            {lugar.gps ? 'Tiempo en ' + lugar.nombre + ' (GPS)' : 'Tiempo en ' + lugar.nombre}
+            {t('Tiempo en') + ' ' + lugar.nombre + (lugar.gps ? ' (GPS)' : '')}
           </Text>
         </View>
         <Pressable onPress={cargar} hitSlop={10}>
           <Ionicons name="refresh" size={18} color={colores.gris} />
         </Pressable>
       </View>
-      {!ciudad ? <Text style={estilos.tarjetaTexto}>No hay ubicacion. Activa el GPS o elige tu ciudad en Mi cuenta.</Text> : null}
+      {!ciudad ? <Text style={estilos.tarjetaTexto}>{t('No hay ubicacion. Activa el GPS o elige tu ciudad en Mi cuenta.')}</Text> : null}
 
       {estado.cargando ? <ActivityIndicator color={colores.verde} style={{ marginTop: 12 }} /> : null}
-      {estado.error ? <Text style={[estilos.tarjetaTexto, { color: colores.rojo }]}>No se pudo cargar el tiempo. Revisa la conexion.</Text> : null}
+      {estado.error ? <Text style={[estilos.tarjetaTexto, { color: colores.rojo }]}>{t('No se pudo cargar el tiempo. Revisa la conexion.')}</Text> : null}
 
       {estado.tiempo ? (
         <>
@@ -68,7 +74,7 @@ export default function Tiempo({ ciudad, onUbicacion }) {
             <Ionicons name={describirCodigo(estado.tiempo.actual.codigo).icono} size={36} color={colores.verde} />
             <View>
               <Text style={{ fontSize: 26, fontWeight: '700', color: colores.texto }}>{Math.round(estado.tiempo.actual.temperatura)} C</Text>
-              <Text style={estilos.tarjetaTexto}>Ahora: {describirCodigo(estado.tiempo.actual.codigo).texto}</Text>
+              <Text style={estilos.tarjetaTexto}>{t('Ahora:')} {t(describirCodigo(estado.tiempo.actual.codigo).texto)}</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row', marginTop: 12, gap: 6 }}>
@@ -93,9 +99,9 @@ export default function Tiempo({ ciudad, onUbicacion }) {
           </View>
           <View style={[estilos.fila, { gap: 6, marginTop: 12 }]}>
             <Ionicons name={consejo.tipo === 'lluvia' ? 'umbrella-outline' : 'information-circle-outline'} size={18} color={colorConsejo} />
-            <Text style={{ flex: 1, fontSize: 14, color: colores.texto }}>{consejo.texto}</Text>
+            <Text style={{ flex: 1, fontSize: 14, color: colores.texto }}>{textoConsejo(consejo)}</Text>
           </View>
-          <Text style={[estilos.tarjetaTexto, { fontSize: 11, marginTop: 10 }]}>Datos: {estado.tiempo.modelo} via Open-Meteo</Text>
+          <Text style={[estilos.tarjetaTexto, { fontSize: 11, marginTop: 10 }]}>{t('Datos:')} {estado.tiempo.modelo} {t('via')} Open-Meteo</Text>
         </>
       ) : null}
     </View>

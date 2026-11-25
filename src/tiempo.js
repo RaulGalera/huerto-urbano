@@ -92,7 +92,7 @@ export function consejoRiego(dias) {
   const lluvia = proximos.reduce((a, d) => a + d.lluvia, 0);
   const maxima = Math.max(...proximos.map((d) => d.maxima));
   if (lluvia >= LLUVIA_SUFICIENTE) {
-    return { tipo: 'lluvia', texto: 'Van a caer unos ' + lluvia.toFixed(1).replace('.', ',') + ' mm en dos dias. Puedes saltarte el riego.' };
+    return { tipo: 'lluvia', mm: lluvia.toFixed(1).replace('.', ','), texto: 'Van a caer unos ' + lluvia.toFixed(1).replace('.', ',') + ' mm en dos dias. Puedes saltarte el riego.' };
   }
   if (maxima >= 30) {
     return { tipo: 'calor', texto: 'Hace calor. Riega a primera hora o al atardecer.' };

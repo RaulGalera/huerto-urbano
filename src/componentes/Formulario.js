@@ -4,17 +4,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { colores, estiloChip, estilos } from '../estilos';
 import { leerFecha, verFecha } from '../util';
 import SelectorFecha from './SelectorFecha';
+import { t } from '../idioma';
 
 function Desplegable({ opciones, valor, onCambio }) {
   const [abierto, setAbierto] = useState(false);
   const elegida = opciones.find((o) => o.valor === valor);
   if (opciones.length === 0) {
-    return <Text style={estilos.tarjetaTexto}>No hay opciones. Crea primero el dato necesario.</Text>;
+    return <Text style={estilos.tarjetaTexto}>{t('No hay opciones. Crea primero el dato necesario.')}</Text>;
   }
   return (
     <View>
       <Pressable style={[estilos.input, estilos.fila, { justifyContent: 'space-between' }]} onPress={() => setAbierto(!abierto)}>
-        <Text style={{ fontSize: 15, color: elegida ? colores.texto : colores.gris }}>{elegida ? elegida.texto : 'Elegir'}</Text>
+        <Text style={{ fontSize: 15, color: elegida ? colores.texto : colores.gris }}>{elegida ? elegida.texto : t('Elegir')}</Text>
         <Ionicons name={abierto ? 'chevron-up' : 'chevron-down'} size={18} color={colores.gris} />
       </Pressable>
       {abierto ? (
@@ -76,14 +77,14 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
       const v = valores[c.clave];
       const vacio = v === undefined || v === null || String(v).trim() === '';
       if (c.obligatorio && vacio) {
-        setError('Falta rellenar: ' + c.etiqueta);
+        setError(t('Falta rellenar:') + ' ' + c.etiqueta);
         return;
       }
       if (vacio) continue;
       if (c.tipo === 'numero') {
         const n = Number(String(v).replace(',', '.'));
         if (isNaN(n) || n < 0) {
-          setError(c.etiqueta + ' tiene que ser un numero');
+          setError(c.etiqueta + ' ' + t('tiene que ser un numero'));
           return;
         }
         limpio[c.clave] = n;
@@ -91,7 +92,7 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
       if (c.tipo === 'fecha') {
         const f = leerFecha(v);
         if (!f) {
-          setError(c.etiqueta + ' tiene que ser una fecha DD/MM/AAAA');
+          setError(c.etiqueta + ' ' + t('tiene que ser una fecha DD/MM/AAAA'));
           return;
         }
         limpio[c.clave] = f;
@@ -105,7 +106,7 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
       <ScrollView style={{ flex: 1, backgroundColor: colores.fondo }} contentContainerStyle={{ width: '100%', maxWidth: 900, alignSelf: 'center', padding: 16, paddingTop: 48 }}>
         <Pressable onPress={onCerrar} hitSlop={10} style={[estilos.fila, { marginBottom: 8, alignSelf: 'flex-start' }]}>
           <Ionicons name="chevron-back" size={18} color={colores.verde} />
-          <Text style={{ color: colores.verde, fontSize: 14 }}>Volver</Text>
+          <Text style={{ color: colores.verde, fontSize: 14 }}>{t('Volver')}</Text>
         </Pressable>
         <Text style={[estilos.titulo, { marginBottom: 4 }]}>{titulo}</Text>
         {campos.map((c) => (
@@ -126,7 +127,7 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
                 value={valores[c.clave] === undefined || valores[c.clave] === null ? '' : String(valores[c.clave])}
                 onChangeText={(t) => cambiar(c.clave, t)}
                 keyboardType={c.tipo === 'numero' ? 'decimal-pad' : c.tipo === 'fecha' ? 'numbers-and-punctuation' : 'default'}
-                placeholder={c.tipo === 'fecha' ? 'DD/MM/AAAA' : c.ejemplo || ''}
+                placeholder={c.tipo === 'fecha' ? t('DD/MM/AAAA') : c.ejemplo || ''}
                 placeholderTextColor={colores.gris}
                 multiline={c.tipo === 'largo'}
               />
@@ -135,15 +136,15 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
         ))}
         {error ? <Text style={{ color: colores.rojo, marginTop: 14 }}>{error}</Text> : null}
         <Pressable style={[estilos.boton, { marginTop: 30 }]} onPress={enviar}>
-          <Text style={estilos.botonTexto}>Guardar</Text>
+          <Text style={estilos.botonTexto}>{t('Guardar')}</Text>
         </Pressable>
         <Pressable style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={onCerrar}>
-          <Text style={estilos.botonSecundarioTexto}>Cancelar</Text>
+          <Text style={estilos.botonSecundarioTexto}>{t('Cancelar')}</Text>
         </Pressable>
         {onBorrar ? (
           <Pressable style={[estilos.fila, { marginTop: 20, justifyContent: 'center', padding: 8, gap: 6 }]} onPress={onBorrar}>
             <Ionicons name="trash-outline" size={18} color={colores.rojo} />
-            <Text style={{ color: colores.rojo, fontWeight: '600' }}>Borrar</Text>
+            <Text style={{ color: colores.rojo, fontWeight: '600' }}>{t('Borrar')}</Text>
           </Pressable>
         ) : null}
       </ScrollView>

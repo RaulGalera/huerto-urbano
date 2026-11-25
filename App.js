@@ -13,6 +13,7 @@ import Siembras from './src/pantallas/Siembras';
 import Riegos from './src/pantallas/Riegos';
 import Cosechas from './src/pantallas/Cosechas';
 import Temporadas from './src/pantallas/Temporadas';
+import { ponerIdioma, t } from './src/idioma';
 
 const pestanas = [
   { clave: 'resumen', texto: 'Inicio', icono: 'home', Pantalla: Resumen },
@@ -48,7 +49,7 @@ function Contenido() {
           return (
             <Pressable key={p.clave} onPress={() => setActual(p.clave)} style={{ flex: 1, alignItems: 'center' }}>
               <Ionicons name={activo ? p.icono : p.icono + '-outline'} size={22} color={activo ? colores.verde : colores.gris} />
-              <Text style={{ fontSize: 11, marginTop: 3, fontWeight: activo ? '700' : '400', color: activo ? colores.verde : colores.gris }}>{p.texto}</Text>
+              <Text style={{ fontSize: 11, marginTop: 3, fontWeight: activo ? '700' : '400', color: activo ? colores.verde : colores.gris }}>{t(p.texto)}</Text>
             </Pressable>
           );
         })}
@@ -60,6 +61,7 @@ function Contenido() {
 
 function Sesion() {
   const { cargado, usuario, usuarios } = useCuenta();
+  if (usuario) ponerIdioma(usuario.idioma || 'es');
   if (!cargado) {
     return (
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -70,7 +72,7 @@ function Sesion() {
   if (!usuario) return <Login />;
   return (
     <DatosProvider key={usuario.id} usuarioId={usuario.id} migrar={usuarios[0] && usuarios[0].id === usuario.id}>
-      <Contenido />
+      <Contenido key={usuario.idioma || 'es'} />
     </DatosProvider>
   );
 }
