@@ -78,8 +78,7 @@ export default function Siembras() {
       renderTitulo={(s) => s.cultivo}
       renderTexto={(s) => [
         [nombrePor(datos.parcelas, s.parcelaId), verFecha(s.fecha), s.cantidad ? s.cantidad + ' ' + t('plantas') : ''].filter(Boolean).join(' - '),
-        cosechaEstimada(s),
-        cosechado(s.id),
+        cosechaEstimada(s) + ' - ' + cosechado(s.id),
       ]}
       renderDato={estimacion}
       avisoBorrar={t('Se borraran tambien sus cosechas. Continuar?')}

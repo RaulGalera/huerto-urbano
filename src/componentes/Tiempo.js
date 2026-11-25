@@ -68,10 +68,9 @@ export default function Tiempo({ ciudad, onUbicacion }) {
       </View>
       {!ciudad ? (
         <>
-          <Text style={estilos.tarjetaTexto}>{t('No hay ubicacion. Activa el GPS o elige tu ciudad en Mi cuenta.')}</Text>
-          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={usarGps} accessibilityRole="button">
-            <Ionicons name="navigate-outline" size={18} color={colores.verde} />
-            <Text style={estilos.botonSecundarioTexto}>{t('Usar mi ubicacion (GPS)')}</Text>
+          <Pressable style={[estilos.fila, { gap: 6, marginTop: 6, alignSelf: 'flex-start' }]} onPress={usarGps} accessibilityRole="button" hitSlop={8}>
+            <Ionicons name="navigate-outline" size={14} color={colores.verde} />
+            <Text style={{ fontSize: 13, color: colores.verde, fontWeight: '600' }}>{t('Usar mi ubicacion (GPS)')}</Text>
           </Pressable>
           {avisoGps ? <Text style={[estilos.tarjetaTexto, { marginTop: 6 }]}>{avisoGps}</Text> : null}
         </>
