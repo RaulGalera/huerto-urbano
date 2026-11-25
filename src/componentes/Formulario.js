@@ -3,6 +3,7 @@ import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estiloChip, estilos } from '../estilos';
 import { leerFecha, verFecha } from '../util';
+import SelectorFecha from './SelectorFecha';
 
 function Desplegable({ opciones, valor, onCambio }) {
   const [abierto, setAbierto] = useState(false);
@@ -66,6 +67,7 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
 
   function cambiar(clave, valor) {
     setValores((v) => ({ ...v, [clave]: valor }));
+    setError('');
   }
 
   function enviar() {
@@ -114,6 +116,8 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
             </Text>
             {c.tipo === 'desplegable' ? (
               <Desplegable opciones={c.opciones} valor={valores[c.clave]} onCambio={(v) => cambiar(c.clave, v)} />
+            ) : c.tipo === 'fecha' ? (
+              <SelectorFecha valor={valores[c.clave]} onCambio={(v) => cambiar(c.clave, v)} />
             ) : c.tipo === 'chips' ? (
               <Chips opciones={c.opciones} valor={valores[c.clave]} onCambio={(v) => cambiar(c.clave, v)} />
             ) : (
