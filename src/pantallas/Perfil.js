@@ -10,9 +10,15 @@ import Admin from './Admin';
 import { exportarCopia, importarCopia } from '../copia';
 import { IDIOMAS, t } from '../idioma';
 import Chips from '../componentes/Chips';
+import Legal from './Legal';
 
 export default function Perfil({ onCerrar }) {
-  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma } = useCuenta();
+  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarNombre, borrarMiCuenta } = useCuenta();
+  const [nombre, setNombre] = useState(usuario.nombre);
+  const [avisoNombre, setAvisoNombre] = useState(null);
+  const [claveBorrar, setClaveBorrar] = useState('');
+  const [avisoBorrar, setAvisoBorrar] = useState('');
+  const [verLegal, setVerLegal] = useState(false);
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');
   const [mensaje, setMensaje] = useState(null);
@@ -92,6 +98,27 @@ export default function Perfil({ onCerrar }) {
     }
   }
 
+  function guardarNombre() {
+    const error = cambiarNombre(usuario.id, nombre);
+    setAvisoNombre(error ? { texto: t(error), color: colores.rojo } : { texto: t('Nombre guardado'), color: colores.verde });
+  }
+
+  function borrarCuenta() {
+    const pregunta = t('Se borrara tu cuenta y todos tus datos. No se puede deshacer. Continuar?');
+    const hacer = () => {
+      const error = borrarMiCuenta(claveBorrar);
+      if (error) setAvisoBorrar(t(error));
+    };
+    if (Platform.OS === 'web') {
+      if (window.confirm(pregunta)) hacer();
+    } else {
+      Alert.alert(t('Borrar mi cuenta'), pregunta, [
+        { text: t('Cancelar'), style: 'cancel' },
+        { text: t('Borrar'), style: 'destructive', onPress: hacer },
+      ]);
+    }
+  }
+
   function guardarContrasena() {
     const error = cambiarContrasena(usuario.id, actual, nueva);
     setMensaje(error ? { texto: t(error), color: colores.rojo } : { texto: t('Contrasena cambiada'), color: colores.verde });
@@ -116,6 +143,16 @@ export default function Perfil({ onCerrar }) {
             <Text style={estilos.tarjetaTitulo}>{usuario.nombre}</Text>
             <Text style={estilos.tarjetaTexto}>@{usuario.usuario} - {t(esAdmin ? 'Administrador' : 'Usuario')}</Text>
           </View>
+        </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo}>{t('Mis datos')}</Text>
+          <Text style={estilos.etiqueta}>{t('Nombre')}</Text>
+          <TextInput style={estilos.input} value={nombre} onChangeText={setNombre} accessibilityLabel={t('Nombre')} />
+          {avisoNombre ? <Text style={{ color: avisoNombre.color, marginTop: 8 }}>{avisoNombre.texto}</Text> : null}
+          <Pressable style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={guardarNombre}>
+            <Text style={estilos.botonSecundarioTexto}>{t('Guardar nombre')}</Text>
+          </Pressable>
         </View>
 
         <View style={estilos.tarjeta}>
@@ -151,7 +188,7 @@ export default function Perfil({ onCerrar }) {
               placeholder={t('Ej: Valencia')}
               placeholderTextColor={colores.gris}
             />
-            <Pressable style={[estilos.boton, { paddingHorizontal: 14, height: 44 }]} onPress={buscar}>
+            <Pressable style={[estilos.boton, { paddingHorizontal: 14, height: 44 }]} onPress={buscar} accessibilityRole="button" accessibilityLabel={t('Buscar')}>
               <Ionicons name="search" size={20} color={colores.blanco} />
             </Pressable>
           </View>
@@ -202,6 +239,22 @@ export default function Perfil({ onCerrar }) {
           </Pressable>
           {avisoCopia ? <Text style={{ color: avisoCopia.color, marginTop: 8 }}>{avisoCopia.texto}</Text> : null}
         </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo}>{t('Privacidad')}</Text>
+          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={() => setVerLegal(true)} accessibilityRole="button">
+            <Ionicons name="shield-checkmark-outline" size={18} color={colores.verde} />
+            <Text style={estilos.botonSecundarioTexto}>{t('Privacidad y aviso legal')}</Text>
+          </Pressable>
+          <Text style={[estilos.etiqueta, { marginTop: 16 }]}>{t('Para borrar tu cuenta escribe tu contrasena')}</Text>
+          <TextInput style={estilos.input} value={claveBorrar} onChangeText={setClaveBorrar} secureTextEntry autoCapitalize="none" accessibilityLabel={t('Contrasena')} />
+          {avisoBorrar ? <Text style={{ color: colores.rojo, marginTop: 8 }}>{avisoBorrar}</Text> : null}
+          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10, borderColor: colores.rojo }]} onPress={borrarCuenta} accessibilityRole="button">
+            <Ionicons name="trash-outline" size={18} color={colores.rojo} />
+            <Text style={[estilos.botonSecundarioTexto, { color: colores.rojo }]}>{t('Borrar mi cuenta')}</Text>
+          </Pressable>
+        </View>
+        {verLegal ? <Legal onCerrar={() => setVerLegal(false)} /> : null}
 
         {esAdmin ? <Admin /> : null}
 

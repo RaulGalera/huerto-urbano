@@ -76,7 +76,7 @@ export default function Resumen({ onPerfil }) {
           <Text style={[estilos.titulo, { marginBottom: 0 }]}>{t('Mi huerto')}</Text>
           <Text style={estilos.tarjetaTexto}>{t('Hola,')} {usuario ? usuario.nombre : ''}</Text>
         </View>
-        <Pressable onPress={onPerfil} hitSlop={10} style={[estilos.fila, { gap: 4 }]}>
+        <Pressable onPress={onPerfil} hitSlop={10} style={[estilos.fila, { gap: 4 }]} accessibilityRole="button" accessibilityLabel={t('Mi cuenta')}>
           {esAdmin ? (
             <View style={{ backgroundColor: colores.naranja, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}>
               <Text style={{ color: colores.blanco, fontSize: 11, fontWeight: '700' }}>ADMIN</Text>

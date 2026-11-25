@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
@@ -26,15 +26,18 @@ function redondear(n) {
 export default function Tiempo({ ciudad, onUbicacion }) {
   const lugar = ciudad || CIUDAD_POR_DEFECTO;
   const [estado, setEstado] = useState({ cargando: true });
-  const intentado = useRef(false);
+  const [avisoGps, setAvisoGps] = useState('');
 
-  useEffect(() => {
-    if (ciudad || intentado.current) return;
-    intentado.current = true;
+  function usarGps() {
+    setAvisoGps(t('Buscando tu ubicacion...'));
     ubicacionActual()
-      .then((u) => onUbicacion && onUbicacion(u))
-      .catch(() => {});
-  }, [ciudad, onUbicacion]);
+      .then((u) => {
+        setAvisoGps('');
+        if (onUbicacion) onUbicacion(u);
+      })
+      .catch(() => setAvisoGps(t('No se pudo usar el GPS. Revisa el permiso de ubicacion.')));
+  }
+
 
   const cargar = useCallback(() => {
     setEstado({ cargando: true });
@@ -59,11 +62,20 @@ export default function Tiempo({ ciudad, onUbicacion }) {
             {t('Tiempo en') + ' ' + lugar.nombre + (lugar.gps ? ' (GPS)' : '')}
           </Text>
         </View>
-        <Pressable onPress={cargar} hitSlop={10}>
+        <Pressable onPress={cargar} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Actualizar el tiempo')}>
           <Ionicons name="refresh" size={18} color={colores.gris} />
         </Pressable>
       </View>
-      {!ciudad ? <Text style={estilos.tarjetaTexto}>{t('No hay ubicacion. Activa el GPS o elige tu ciudad en Mi cuenta.')}</Text> : null}
+      {!ciudad ? (
+        <>
+          <Text style={estilos.tarjetaTexto}>{t('No hay ubicacion. Activa el GPS o elige tu ciudad en Mi cuenta.')}</Text>
+          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={usarGps} accessibilityRole="button">
+            <Ionicons name="navigate-outline" size={18} color={colores.verde} />
+            <Text style={estilos.botonSecundarioTexto}>{t('Usar mi ubicacion (GPS)')}</Text>
+          </Pressable>
+          {avisoGps ? <Text style={[estilos.tarjetaTexto, { marginTop: 6 }]}>{avisoGps}</Text> : null}
+        </>
+      ) : null}
 
       {estado.cargando ? <ActivityIndicator color={colores.verde} style={{ marginTop: 12 }} /> : null}
       {estado.error ? <Text style={[estilos.tarjetaTexto, { color: colores.rojo }]}>{t('No se pudo cargar el tiempo. Revisa la conexion.')}</Text> : null}

@@ -37,13 +37,13 @@ function Calendario({ inicial, onElegir, onCerrar }) {
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'center', padding: 20 }} onPress={onCerrar}>
         <Pressable style={{ backgroundColor: colores.blanco, borderRadius: 14, padding: 16, width: '100%', maxWidth: 380, alignSelf: 'center' }} onPress={() => {}}>
           <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 12 }]}>
-            <Pressable onPress={() => mover(-1)} hitSlop={10} style={{ padding: 4 }}>
+            <Pressable onPress={() => mover(-1)} hitSlop={10} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel={t('Mes anterior')}>
               <Ionicons name="chevron-back" size={22} color={colores.verde} />
             </Pressable>
             <Text style={{ fontSize: 16, fontWeight: '700', color: colores.texto }}>
               {t(MESES[mes])} {anio}
             </Text>
-            <Pressable onPress={() => mover(1)} hitSlop={10} style={{ padding: 4 }}>
+            <Pressable onPress={() => mover(1)} hitSlop={10} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel={t('Mes siguiente')}>
               <Ionicons name="chevron-forward" size={22} color={colores.verde} />
             </Pressable>
           </View>

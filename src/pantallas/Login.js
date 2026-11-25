@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
 import { useCuenta } from '../cuenta';
 import Chips from '../componentes/Chips';
+import Casilla from '../componentes/Casilla';
+import Legal from './Legal';
 import { IDIOMAS, idioma, ponerIdioma, t } from '../idioma';
 
 function Campo({ etiqueta, valor, onCambio, secreto, ejemplo }) {
@@ -33,6 +35,9 @@ export default function Login() {
   const [repetir, setRepetir] = useState('');
   const [error, setError] = useState('');
   const [idiomaElegido, setIdiomaElegido] = useState(idioma());
+  const [edad, setEdad] = useState(false);
+  const [privacidad, setPrivacidad] = useState(false);
+  const [verLegal, setVerLegal] = useState(false);
 
   function elegirIdioma(i) {
     ponerIdioma(i);
@@ -48,7 +53,7 @@ export default function Login() {
       setError(t('Las contrasenas no coinciden'));
       return;
     }
-    setError(registrar(nombre, usuario, contrasena, idiomaElegido) || '');
+    setError(registrar(nombre, usuario, contrasena, idiomaElegido, { edad, privacidad }) || '');
   }
 
   function cambiarModo() {
@@ -75,6 +80,8 @@ export default function Login() {
           <View>
             <Text style={estilos.etiqueta}>{t('Idioma de la app')}</Text>
             <Chips opciones={IDIOMAS} valor={idiomaElegido} onCambiar={elegirIdioma} abajo={0} />
+            <Casilla marcada={edad} onCambiar={setEdad} texto={t('Tengo 14 anos o mas')} />
+            <Casilla marcada={privacidad} onCambiar={setPrivacidad} texto={t('He leido y acepto la politica de privacidad y las condiciones de uso')} />
           </View>
         ) : null}
 
@@ -88,6 +95,10 @@ export default function Login() {
             {t(modo === 'entrar' ? 'No tengo cuenta, quiero registrarme' : 'Ya tengo cuenta, quiero entrar')}
           </Text>
         </Pressable>
+        <Pressable style={{ marginTop: 8, alignItems: 'center', padding: 6 }} onPress={() => setVerLegal(true)} accessibilityRole="link">
+          <Text style={{ color: colores.gris, textDecorationLine: 'underline' }}>{t('Privacidad y aviso legal')}</Text>
+        </Pressable>
+        {verLegal ? <Legal onCerrar={() => setVerLegal(false)} /> : null}
       </ScrollView>
     </KeyboardAvoidingView>
   );

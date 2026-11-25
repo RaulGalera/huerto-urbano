@@ -35,11 +35,12 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
             style={{ flex: 1, height: 42, fontSize: 15, color: colores.texto, outlineStyle: 'none' }}
             value={busqueda}
             onChangeText={setBusqueda}
+            accessibilityLabel={t('Buscar')}
             placeholder={t('Buscar')}
             placeholderTextColor={colores.gris}
           />
           {busqueda ? (
-            <Pressable onPress={() => setBusqueda('')} hitSlop={10}>
+            <Pressable onPress={() => setBusqueda('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Borrar busqueda')}>
               <Ionicons name="close-circle" size={18} color={colores.gris} />
             </Pressable>
           ) : null}

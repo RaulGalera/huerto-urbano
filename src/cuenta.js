@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { sha256 } from './sha256';
+import { comprobarClave, crearClave, esAntigua } from './claves';
+import { VERSION_LEGAL } from './legal';
 import { configInicial } from './precios';
 
 const CLAVE_USUARIOS = 'huerto_usuarios';
@@ -15,9 +16,6 @@ function idNuevo() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-function cifrar(usuario, contrasena) {
-  return sha256('huerto:' + usuario.toLowerCase() + ':' + contrasena);
-}
 
 export function CuentaProvider({ children }) {
   const [usuarios, setUsuarios] = useState([]);
@@ -40,7 +38,7 @@ export function CuentaProvider({ children }) {
               id: idNuevo(),
               usuario: ADMIN_INICIAL.usuario,
               nombre: 'Administrador',
-              clave: cifrar(ADMIN_INICIAL.usuario, ADMIN_INICIAL.contrasena),
+              ...crearClave(ADMIN_INICIAL.contrasena),
               rol: 'admin',
               creado: new Date().toISOString(),
             },
@@ -66,19 +64,23 @@ export function CuentaProvider({ children }) {
 
   function entrar(usuario, contrasena) {
     const u = usuarios.find((x) => x.usuario.toLowerCase() === usuario.trim().toLowerCase());
-    if (!u || u.clave !== cifrar(u.usuario, contrasena)) return 'Usuario o contrasena incorrectos';
+    if (!u || !comprobarClave(u, contrasena)) return 'Usuario o contrasena incorrectos';
+    if (esAntigua(u)) guardarUsuarios(usuarios.map((x) => (x.id === u.id ? { ...x, ...crearClave(contrasena) } : x)));
     setSesion(u.id);
     AsyncStorage.setItem(CLAVE_SESION, u.id);
     return null;
   }
 
-  function registrar(nombre, usuario, contrasena, idioma = 'es') {
+  function registrar(nombre, usuario, contrasena, idioma = 'es', acepta = {}) {
     const limpio = usuario.trim();
     if (!nombre.trim() || !limpio || !contrasena) return 'Rellena todos los campos';
     if (!/^[a-zA-Z0-9_.-]{3,20}$/.test(limpio)) return 'El usuario debe tener de 3 a 20 letras o numeros, sin espacios';
     if (contrasena.length < 6) return 'La contrasena debe tener al menos 6 caracteres';
     if (usuarios.some((x) => x.usuario.toLowerCase() === limpio.toLowerCase())) return 'Ese usuario ya existe';
-    const nuevo = { id: idNuevo(), usuario: limpio, nombre: nombre.trim(), clave: cifrar(limpio, contrasena), rol: 'usuario', idioma, creado: new Date().toISOString() };
+    if (!acepta.edad) return 'Tienes que tener 14 anos o mas para registrarte';
+    if (!acepta.privacidad) return 'Tienes que aceptar la politica de privacidad y las condiciones de uso';
+    const ahora = new Date().toISOString();
+    const nuevo = { id: idNuevo(), usuario: limpio, nombre: nombre.trim(), ...crearClave(contrasena), rol: 'usuario', idioma, creado: ahora, legal: { version: VERSION_LEGAL, fecha: ahora } };
     guardarUsuarios([...usuarios, nuevo]);
     setSesion(nuevo.id);
     AsyncStorage.setItem(CLAVE_SESION, nuevo.id);
@@ -92,9 +94,32 @@ export function CuentaProvider({ children }) {
 
   function cambiarContrasena(id, actual, nueva) {
     const u = usuarios.find((x) => x.id === id);
-    if (!u || u.clave !== cifrar(u.usuario, actual)) return 'La contrasena actual no es correcta';
+    if (!u || !comprobarClave(u, actual)) return 'La contrasena actual no es correcta';
     if (nueva.length < 6) return 'La contrasena nueva debe tener al menos 6 caracteres';
-    guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, clave: cifrar(x.usuario, nueva) } : x)));
+    guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, ...crearClave(nueva) } : x)));
+    return null;
+  }
+
+  function cambiarNombre(id, nombre) {
+    if (!nombre.trim()) return 'Rellena todos los campos';
+    guardarUsuarios(usuarios.map((x) => (x.id === id ? { ...x, nombre: nombre.trim() } : x)));
+    return null;
+  }
+
+  function borrarMiCuenta(contrasena) {
+    const u = usuarios.find((x) => x.id === sesion);
+    if (!u || !comprobarClave(u, contrasena)) return 'La contrasena actual no es correcta';
+    const admins = usuarios.filter((x) => x.rol === 'admin');
+    if (u.rol === 'admin' && admins.length === 1 && usuarios.length > 1) return 'Tiene que quedar al menos un administrador';
+    const resto = usuarios.filter((x) => x.id !== u.id);
+    AsyncStorage.removeItem('huerto_datos_' + u.id);
+    if (resto.length === 0) {
+      setUsuarios([]);
+      AsyncStorage.removeItem(CLAVE_USUARIOS);
+    } else {
+      guardarUsuarios(resto);
+    }
+    salir();
     return null;
   }
 
@@ -125,7 +150,7 @@ export function CuentaProvider({ children }) {
 
   return (
     <CuentaContext.Provider
-      value={{ usuarios, usuario, esAdmin: usuario ? usuario.rol === 'admin' : false, config, cargado, entrar, registrar, salir, cambiarContrasena, cambiarIdioma, cambiarRol, borrarUsuario, guardarConfig }}
+      value={{ usuarios, usuario, esAdmin: usuario ? usuario.rol === 'admin' : false, config, cargado, entrar, registrar, salir, cambiarContrasena, cambiarNombre, cambiarIdioma, borrarMiCuenta, cambiarRol, borrarUsuario, guardarConfig }}
     >
       {children}
     </CuentaContext.Provider>

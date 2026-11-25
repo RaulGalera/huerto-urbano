@@ -139,7 +139,7 @@ export default function Admin() {
                 keyboardType="decimal-pad"
                 onChangeText={(t) => setPrecios(precios.map((x) => (x.cultivo === p.cultivo ? { ...x, precio: t } : x)))}
               />
-              <Pressable hitSlop={8} onPress={() => setPrecios(precios.filter((x) => x.cultivo !== p.cultivo))}>
+              <Pressable hitSlop={8} onPress={() => setPrecios(precios.filter((x) => x.cultivo !== p.cultivo))} accessibilityRole="button" accessibilityLabel={t('Quitar') + ' ' + p.cultivo}>
                 <Ionicons name="close-circle-outline" size={22} color={colores.rojo} />
               </Pressable>
             </View>
@@ -147,7 +147,7 @@ export default function Admin() {
         <View style={[estilos.fila, { gap: 8, marginTop: 12 }]}>
           <TextInput style={[estilos.input, { flex: 1, height: 38 }]} value={nuevoCultivo} onChangeText={setNuevoCultivo} placeholder={t('Nuevo cultivo')} placeholderTextColor={colores.gris} />
           <TextInput style={[estilos.input, { width: 90, height: 38, textAlign: 'right' }]} value={nuevoPrecio} onChangeText={setNuevoPrecio} placeholder="EUR/kg" placeholderTextColor={colores.gris} keyboardType="decimal-pad" />
-          <Pressable hitSlop={8} onPress={anadirCultivo}>
+          <Pressable hitSlop={8} onPress={anadirCultivo} accessibilityRole="button" accessibilityLabel={t('Anadir cultivo')}>
             <Ionicons name="add-circle" size={26} color={colores.verde} />
           </Pressable>
         </View>
@@ -188,6 +188,8 @@ export default function Admin() {
             {u.id !== usuario.id ? (
               <Pressable
                 hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t('Borrar usuario') + ' ' + u.usuario}
                 onPress={() =>
                   confirmar(t('Borrar a') + ' ' + u.usuario + ' ' + t('y todos sus datos?'), () => {
                     const error = borrarUsuario(u.id);
