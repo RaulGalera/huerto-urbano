@@ -29,6 +29,10 @@ export function crearDatosEjemplo(hoy) {
     { id: id(), cultivo: 'Habas', parcelaId: b1.id, temporadaId: anterior.id, fecha: dia(hoy, -240), cantidad: 20, notas: '' },
   ];
   const [tomate, pimiento, calabacin, lechuga, fresa, cebolla, habas] = siembras;
+  siembras.push(
+    { id: id(), cultivo: 'Zanahoria', parcelaId: mesa.id, temporadaId: actual.id, fecha: dia(hoy, -80), cantidad: 20, notas: '' },
+    { id: id(), cultivo: 'Rabano', parcelaId: macetas.id, temporadaId: actual.id, fecha: dia(hoy, -22), cantidad: 15, notas: '' }
+  );
 
   const cosechas = [
     [tomate, -30, 3.5], [tomate, -18, 6], [tomate, -6, 4.2],

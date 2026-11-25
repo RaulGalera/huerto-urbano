@@ -4,6 +4,8 @@ import ListaEditable from '../componentes/ListaEditable';
 import { hoy, useDatos } from '../datos';
 import { estiloChip } from '../estilos';
 import { nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
+import { estadoSiembra } from '../cultivos';
+import { colores } from '../estilos';
 
 export default function Siembras() {
   const { datos } = useDatos();
@@ -23,6 +25,19 @@ export default function Siembras() {
 
   const filtros = [...temporadas.map((t) => ({ id: t.id, texto: t.nombre })), { id: 'todas', texto: 'Todas' }];
   const items = ordenarPorFecha(filtro === 'todas' ? datos.siembras : datos.siembras.filter((s) => s.temporadaId === filtro));
+
+  function estimacion(s) {
+    const e = estadoSiembra(s, datos.cosechas, hoy());
+    if (!e) return null;
+    if (e.lista) return { texto: 'Lista para cosechar', color: colores.verde };
+    if (e.faltan > 0 && !e.cosechada) return { texto: 'Cosecha en ' + e.faltan + (e.faltan === 1 ? ' dia' : ' dias'), color: colores.naranja };
+    return null;
+  }
+
+  function cosechaEstimada(s) {
+    const e = estadoSiembra(s, datos.cosechas, hoy());
+    return e ? 'Cosecha estimada: ' + verFecha(e.fecha) : 'Cultivo sin fecha de cosecha conocida';
+  }
 
   function cosechado(id) {
     const lista = datos.cosechas.filter((c) => c.siembraId === id);
@@ -65,8 +80,10 @@ export default function Siembras() {
       renderTitulo={(s) => s.cultivo}
       renderTexto={(s) => [
         [nombrePor(datos.parcelas, s.parcelaId), verFecha(s.fecha), s.cantidad ? s.cantidad + ' plantas' : ''].filter(Boolean).join(' - '),
+        cosechaEstimada(s),
         cosechado(s.id),
       ]}
+      renderDato={estimacion}
       avisoBorrar="Se borraran tambien sus cosechas. Continuar?"
     />
   );
