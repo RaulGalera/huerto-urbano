@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { comprobarClave, crearClave, esAntigua } from './claves';
 import { VERSION_LEGAL } from './legal';
-import { configInicial } from './precios';
+import { actualizarPrecios, configInicial, VERSION_PRECIOS } from './precios';
 
 const CLAVE_USUARIOS = 'huerto_usuarios';
 const CLAVE_SESION = 'huerto_sesion';
@@ -49,7 +49,9 @@ export function CuentaProvider({ children }) {
         if (s && lista.some((x) => x.id === s)) setSesion(s);
         if (c) {
           const guardada = JSON.parse(c);
-          setConfig({ ...configInicial, ...guardada, precios: { ...(guardada.precios || configInicial.precios) } });
+          const precios = { ...(guardada.precios || configInicial.precios) };
+          const viejos = guardada.versionPrecios !== VERSION_PRECIOS;
+          setConfig({ ...configInicial, ...guardada, precios: viejos ? actualizarPrecios(precios) : precios, versionPrecios: VERSION_PRECIOS });
         }
       } finally {
         setCargado(true);

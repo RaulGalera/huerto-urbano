@@ -5,8 +5,8 @@ import { colores, estilos } from '../estilos';
 import { useCuenta } from '../cuenta';
 import { hoy, leerDatos, useDatos, vacio } from '../datos';
 import { crearDatosEjemplo } from '../ejemplo';
-import { normalizar, preciosIniciales } from '../precios';
-import { numero } from '../util';
+import { normalizar, origenPrecio, preciosIniciales } from '../precios';
+import { numero, verFecha } from '../util';
 import { t } from '../idioma';
 
 function confirmar(mensaje, accion) {
@@ -34,6 +34,16 @@ function Seccion({ icono, titulo, children }) {
 
 function aTexto(n) {
   return String(n).replace('.', ',');
+}
+
+function textoOrigen(cultivo, valor) {
+  const o = origenPrecio(cultivo, aNumero(valor));
+  if (!o) return null;
+  if (o.aMano) return t('Cambiado a mano');
+  const partes = [t(o.nombre), t(o.tipo)];
+  if (o.nota) partes.push(t(o.nota));
+  if (o.fecha) partes.push(verFecha(o.fecha));
+  return partes.join(', ');
 }
 
 function aNumero(texto) {
@@ -127,12 +137,16 @@ export default function Admin() {
 
       <Seccion icono="pricetags" titulo={t('Precios de mercado (EUR/kg)')}>
         <Text style={[estilos.tarjetaTexto, { marginBottom: 8 }]}>{t('Se usan para calcular el beneficio de todos los usuarios.')}</Text>
+        <Text style={[estilos.tarjetaTexto, { marginBottom: 8 }]}>{t('Son precios oficiales: el mayorista de Mercamadrid y el de origen del Ministerio de Agricultura. Debajo de cada uno sale su fuente y su fecha. Los marcados como aproximado no salen en esas fuentes.')}</Text>
         {precios
           .slice()
           .sort((a, b) => a.cultivo.localeCompare(b.cultivo))
           .map((p) => (
             <View key={p.cultivo} style={[estilos.fila, { gap: 8, marginTop: 6 }]}>
-              <Text style={{ flex: 1, textTransform: 'capitalize', color: colores.texto }}>{p.cultivo}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ textTransform: 'capitalize', color: colores.texto }}>{p.cultivo}</Text>
+                {textoOrigen(p.cultivo, p.precio) ? <Text style={{ fontSize: 12, color: colores.gris }}>{textoOrigen(p.cultivo, p.precio)}</Text> : null}
+              </View>
               <TextInput
                 style={[estilos.input, { width: 90, height: 38, textAlign: 'right' }]}
                 value={p.precio}

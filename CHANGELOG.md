@@ -2,6 +2,12 @@
 
 Todos los cambios importantes de la app. Las fechas van en formato AAAA-MM-DD.
 
+## [Sin publicar]
+
+### Cambiado
+
+- Precios reales: mayorista de Mercamadrid (Mercasa) y en origen del Ministerio de Agricultura, con su fuente y su fecha en la pantalla de admin. Los precios que el admin no habia tocado se actualizan solos.
+
 ## [1.0.0] - 2026-11-26
 
 ### Nuevo

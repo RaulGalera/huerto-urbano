@@ -72,7 +72,7 @@ Cuentas
 Modo admin
 
 - Estadisticas de toda la app.
-- Precios de mercado por cultivo, precio del agua y porcentaje de impuestos.
+- Precios de mercado reales por cultivo (Mercamadrid y Ministerio de Agricultura, con fuente y fecha), precio del agua y porcentaje de impuestos.
 - Gestion de usuarios (dar o quitar admin, borrar).
 - Cargar un huerto de ejemplo para hacer demostraciones.
 
@@ -153,7 +153,7 @@ src/
   informe.js              HTML del balance para el PDF
   pdf.js                  Crear y abrir el PDF
   ejemplo.js              Huerto de ejemplo para demostraciones
-  precios.js              Precios de mercado por defecto
+  precios.js              Precios de mercado reales con su fuente y fecha
   cultivos.js             Dias hasta cosecha, meses de siembra y familia
   consejos.js             Rotacion de cultivos y plantas amigas y enemigas
   csv.js                  Exportar siembras, riegos y cosechas a CSV
