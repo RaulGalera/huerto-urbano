@@ -13,6 +13,8 @@ import Chips from '../componentes/Chips';
 import Legal from './Legal';
 import { DIAS_AVISO_RIEGO, HORA_AVISO, pedirPermiso, probarAviso, programarAvisos } from '../avisos';
 import { fechaLocal } from '../util';
+import { csvCosechas, csvRiegos, csvSiembras } from '../csv';
+import { compartirTexto } from '../archivos';
 
 export default function Perfil({ onCerrar }) {
   const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarAvisos, cambiarNombre, borrarMiCuenta } = useCuenta();
@@ -25,6 +27,7 @@ export default function Perfil({ onCerrar }) {
   const [nueva, setNueva] = useState('');
   const [mensaje, setMensaje] = useState(null);
   const [avisoRiego, setAvisoRiego] = useState('');
+  const [avisoCsv, setAvisoCsv] = useState(null);
   const { datos, guardarAjustes, reemplazar } = useDatos();
   const [textoCopia, setTextoCopia] = useState('');
   const [avisoCopia, setAvisoCopia] = useState(null);
@@ -54,6 +57,17 @@ export default function Perfil({ onCerrar }) {
       setAvisoCiudad(lista.length ? '' : t('No se ha encontrado esa ciudad'));
     } catch (e) {
       setAvisoCiudad(t('No se pudo buscar. Revisa la conexion.'));
+    }
+  }
+
+  async function exportarCsv(tipo) {
+    const generar = { siembras: csvSiembras, riegos: csvRiegos, cosechas: csvCosechas }[tipo];
+    const nombre = tipo + '-' + fechaLocal() + '.csv';
+    try {
+      const r = await compartirTexto(generar(datos), nombre, 'text/csv');
+      setAvisoCsv({ texto: r === 'descargado' ? t('Archivo descargado:') + ' ' + nombre : t('Archivo listo:') + ' ' + nombre, color: colores.verde });
+    } catch (e) {
+      setAvisoCsv({ texto: t('No se pudo exportar el archivo'), color: colores.rojo });
     }
   }
 
@@ -295,6 +309,24 @@ export default function Perfil({ onCerrar }) {
               </Text>
             </Pressable>
           ))}
+        </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo}>{t('Exportar a Excel')}</Text>
+          <Text style={estilos.tarjetaTexto}>{t('Archivos CSV que se abren con Excel o Google Sheets.')}</Text>
+          <View style={[estilos.fila, { gap: 8, marginTop: 10, flexWrap: 'wrap' }]}>
+            {[
+              ['siembras', 'Siembras'],
+              ['riegos', 'Riegos'],
+              ['cosechas', 'Cosechas'],
+            ].map(([tipo, texto]) => (
+              <Pressable key={tipo} style={[estilos.botonSecundario, estilos.fila, { gap: 6, flexGrow: 1, justifyContent: 'center', paddingHorizontal: 12 }]} onPress={() => exportarCsv(tipo)} accessibilityLabel={t('Exportar') + ' ' + t(texto)}>
+                <Ionicons name="document-text-outline" size={16} color={colores.verde} />
+                <Text style={estilos.botonSecundarioTexto}>{t(texto)}</Text>
+              </Pressable>
+            ))}
+          </View>
+          {avisoCsv ? <Text style={{ color: avisoCsv.color, marginTop: 10 }}>{avisoCsv.texto}</Text> : null}
         </View>
 
         <View style={estilos.tarjeta}>

@@ -6,7 +6,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
-![Tests](https://img.shields.io/badge/tests-67_pasan-2E7D32)
+![Tests](https://img.shields.io/badge/tests-80_pasan-2E7D32)
 ![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
 
 ## Indice
@@ -32,7 +32,8 @@ Gestion del huerto
 - Temporadas con fecha de inicio y fin. Cada temporada muestra sus siembras, kilos y beneficio, y una pantalla compara dos temporadas: siembras, kilos, agua, ingresos, gastos, beneficio y cultivo estrella, con el cambio en porcentaje.
 - Parcelas con superficie, ubicacion, gastos por temporada y estado del riego.
 - Siembras con cultivo, parcela, temporada, fecha y cantidad. Fecha de cosecha estimada segun el cultivo.
-- Riegos con litros y metodo (manguera, regadera o goteo).
+- Al sembrar avisa de la rotacion de cultivos (si en esa parcela hubo la misma familia la temporada anterior) y de las plantas amigas y enemigas que ya hay en la parcela.
+- Riegos con litros y metodo (manguera, regadera o goteo). Si llueve 5 mm o mas cuenta como riego en las parcelas al aire libre.
 - Cosechas con kilos por siembra.
 - Buscador en todas las listas (sin distinguir mayusculas ni tildes) y panel de filtros combinables por temporada, parcela, verdura y metodo de riego, con los filtros activos visibles y faciles de quitar.
 
@@ -51,7 +52,7 @@ Cuentas
 - Idioma elegible al registrarse (espanol por defecto o ingles) y cambiable despues.
 - Modo oscuro: como el movil, claro u oscuro.
 - Avisos de riego en el movil: si una parcela lleva 3 dias o mas sin regar te llega una notificacion a las 9:00. Se activan en Mi cuenta y tienen un boton para probarlos.
-- Mi cuenta: cambiar nombre, contrasena, idioma, apariencia, avisos y ubicacion, copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
+- Mi cuenta: cambiar nombre, contrasena, idioma, apariencia, avisos y ubicacion, exportar siembras, riegos y cosechas a Excel (CSV), copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
 
 Modo admin
 
@@ -110,7 +111,7 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 npm test
 ```
 
-67 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros, graficas y datos de ejemplo.
+80 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros, graficas, datos de ejemplo, rotacion y plantas amigas, lluvia como riego y exportar a CSV.
 
 ## Arquitectura
 
@@ -128,8 +129,11 @@ src/
   pdf.js                  Crear y abrir el PDF
   ejemplo.js              Huerto de ejemplo para demostraciones
   precios.js              Precios de mercado por defecto
-  cultivos.js             Dias hasta cosecha y meses de siembra
-  tiempo.js               Prevision de Open-Meteo y consejo de riego
+  cultivos.js             Dias hasta cosecha, meses de siembra y familia
+  consejos.js             Rotacion de cultivos y plantas amigas y enemigas
+  csv.js                  Exportar siembras, riegos y cosechas a CSV
+  archivos.js             Descargar o compartir archivos
+  tiempo.js               Prevision de Open-Meteo, lluvia de los ultimos dias y consejo de riego
   ubicacion.js            GPS con expo-location
   copia.js                Exportar y restaurar datos, filtro del buscador
   avisos.js               Avisos de riego programados en el movil
@@ -156,7 +160,7 @@ La logica que se puede probar (calculos, fechas, tiempo, claves, copia) esta en 
 ```
 Usuario     id, usuario, nombre, clave, sal, v, rol (admin | usuario), idioma, tema, avisos, bienvenida, creado, legal
 Temporada   id, nombre, inicio, fin
-Parcela     id, nombre, metros, ubicacion, gastos, notas
+Parcela     id, nombre, metros, ubicacion, aireLibre (si | no), gastos, notas
 Siembra     id, cultivo, parcelaId, temporadaId, fecha, cantidad, notas
 Riego       id, parcelaId, fecha, litros, metodo
 Cosecha     id, siembraId, fecha, kilos, notas
