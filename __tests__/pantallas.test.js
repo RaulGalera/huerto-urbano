@@ -6,6 +6,7 @@ import Chips from '../src/componentes/Chips';
 import Casilla from '../src/componentes/Casilla';
 import PanelFiltros, { Pastillas } from '../src/componentes/Filtros';
 import Login from '../src/pantallas/Login';
+import Comparar from '../src/pantallas/Comparar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CuentaProvider, useCuenta } from '../src/cuenta';
 
@@ -99,6 +100,20 @@ describe('Filtros', () => {
     await fireEvent.press(screen.getByText('Bancal 1'));
     expect(onQuitar).toHaveBeenCalledWith('parcela');
   });
+});
+
+test('Comparar muestra las dos temporadas y el cambio', async () => {
+  const dos = {
+    ...datos,
+    temporadas: [...datos.temporadas, { id: 't2', nombre: 'Otono', inicio: '2026-09-01', fin: '2026-12-31' }],
+    siembras: [...datos.siembras, { id: 's2', cultivo: 'Tomate', parcelaId: 'p1', temporadaId: 't2', fecha: '2026-09-10' }],
+    cosechas: [...datos.cosechas, { id: 'c2', siembraId: 's2', fecha: '2026-11-01', kilos: '6' }],
+  };
+  await render(<Comparar datos={dos} config={config} onCerrar={() => {}} />);
+  expect(screen.getByText('Comparar temporadas')).toBeTruthy();
+  expect(screen.getByText('12,0 kg')).toBeTruthy();
+  expect(screen.getByText('6,0 kg')).toBeTruthy();
+  expect(screen.getAllByText('-50%').length).toBeGreaterThan(0);
 });
 
 describe('Login', () => {

@@ -19,7 +19,7 @@ function confirmar(mensaje, accion) {
   ]);
 }
 
-export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloNuevo, tituloEditar, campos, nuevo, items, renderTitulo, renderTexto, renderDato, avisoBorrar, filtros = [], resumen }) {
+export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloNuevo, tituloEditar, campos, nuevo, items, renderTitulo, renderTexto, renderDato, avisoBorrar, filtros = [], resumen, accion }) {
   const { guardar, borrar } = useDatos();
   const [editando, setEditando] = useState(null);
   const [busqueda, setBusqueda] = useState('');
@@ -44,7 +44,10 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
 
   return (
     <View style={estilos.pantalla}>
-      <Text style={estilos.titulo}>{titulo}</Text>
+      <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 14 }]}>
+        <Text style={[estilos.titulo, { marginBottom: 0 }]}>{titulo}</Text>
+        {accion}
+      </View>
       {verBarra ? (
         <View style={[estilos.fila, { gap: 8, marginBottom: 10 }]}>
           <View style={[estilos.fila, estilos.input, { flex: 1, gap: 8, height: 44 }]}>

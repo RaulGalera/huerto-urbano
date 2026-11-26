@@ -6,7 +6,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
-![Tests](https://img.shields.io/badge/tests-52_pasan-2E7D32)
+![Tests](https://img.shields.io/badge/tests-57_pasan-2E7D32)
 ![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
 
 ## Indice
@@ -29,7 +29,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 
 Gestion del huerto
 
-- Temporadas con fecha de inicio y fin. Cada temporada muestra sus siembras, kilos y beneficio para poder compararlas.
+- Temporadas con fecha de inicio y fin. Cada temporada muestra sus siembras, kilos y beneficio, y una pantalla compara dos temporadas: siembras, kilos, agua, ingresos, gastos, beneficio y cultivo estrella, con el cambio en porcentaje.
 - Parcelas con superficie, ubicacion, gastos por temporada y estado del riego.
 - Siembras con cultivo, parcela, temporada, fecha y cantidad. Fecha de cosecha estimada segun el cultivo.
 - Riegos con litros y metodo (manguera, regadera o goteo).
@@ -107,7 +107,7 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 npm test
 ```
 
-52 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, login y registro) con Testing Library, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
+57 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login y registro) con Testing Library, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
 
 ## Arquitectura
 
