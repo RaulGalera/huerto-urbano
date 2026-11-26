@@ -4,6 +4,8 @@ App multiplataforma para gestionar un huerto urbano: parcelas, siembras, riegos 
 
 Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Android, iOS y web (escritorio desde el navegador).
 
+Quien tiene un huerto en una terraza, un patio o un huerto municipal suele apuntarlo todo en una libreta o no apuntarlo: cuando riega, que planto en cada bancal la temporada pasada o si de verdad le sale a cuenta. Huerto Urbano junta todo eso en el movil, avisa cuando toca regar (y no avisa si ya ha llovido), da consejos al sembrar y calcula cuanto has ganado con precios reales de mercado.
+
 [![Tests](https://github.com/RaulGalera/huerto-urbano/actions/workflows/tests.yml/badge.svg)](https://github.com/RaulGalera/huerto-urbano/actions/workflows/tests.yml)
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
@@ -21,6 +23,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 - [Prueba rapida](#prueba-rapida)
 - [Funcionalidades](#funcionalidades)
 - [Capturas](#capturas)
+- [Fuentes de datos](#fuentes-de-datos)
 - [Tecnologias](#tecnologias)
 - [Puesta en marcha](#puesta-en-marcha)
 - [Scripts](#scripts)
@@ -84,6 +87,19 @@ Modo admin
 | <img src="docs/capturas/inicio.png" width="220" alt="Inicio" /> | <img src="docs/capturas/graficas.png" width="220" alt="Graficas" /> | <img src="docs/capturas/comparar.png" width="220" alt="Comparar temporadas" /> |
 | **Nueva siembra con consejos** | **Filtros** | **Modo oscuro** |
 | <img src="docs/capturas/consejos.png" width="220" alt="Consejos al sembrar" /> | <img src="docs/capturas/filtros.png" width="220" alt="Filtros" /> | <img src="docs/capturas/oscuro.png" width="220" alt="Modo oscuro" /> |
+| **Agua por parcela y coste** | **Precios reales con su fuente** | **Tamano del texto** |
+| <img src="docs/capturas/agua.png" width="220" alt="Grafica de agua por parcela" /> | <img src="docs/capturas/precios.png" width="220" alt="Precios de mercado con fuente y fecha" /> | <img src="docs/capturas/texto.png" width="220" alt="Opcion de tamano del texto" /> |
+
+## Fuentes de datos
+
+| Dato | Fuente | Como se usa |
+| --- | --- | --- |
+| Tiempo y lluvia | [Open-Meteo](https://open-meteo.com/) (modelo AROME de Meteo-France) | Prevision de 3 dias y lluvia de los 3 dias anteriores. Gratis, sin clave y solo recibe coordenadas. |
+| Precios mayoristas | [Mercasa](https://www.mercasa.es/precios-y-mercados-mayoristas/) (Mercamadrid) | Tomate, lechuga, pimiento, cebolla, patata, judia verde, coliflor, berenjena y sandia. |
+| Precios en origen | [Ministerio de Agricultura](https://www.mapa.gob.es/es/agricultura/temas/producciones-agricolas/frutas-y-hortalizas/boletin_semanal_precios.aspx) (informe semanal de coyuntura) | Calabacin, zanahoria, pepino, espinaca, acelga, ajo, brocoli, puerro y melon. |
+| Calendario de cultivos | Datos propios en `src/cultivos.js` | Dias hasta la cosecha, meses de siembra y familia de cada cultivo. |
+
+Ninguna fuente de precios tiene API, asi que los precios van dentro de la app con su fuente y su fecha (`src/precios.js`) y el admin los puede cambiar. Fresa, calabaza, haba, guisante y rabano no salen en esas fuentes y estan marcados como aproximados. La lechuga va por unidad, como la publica Mercamadrid.
 
 ## Tecnologias
 
@@ -199,17 +215,44 @@ El estado se reparte en dos Context de React:
 - `CuentaProvider` (src/cuenta.js): lista de usuarios, sesion activa y configuracion global de precios.
 - `DatosProvider` (src/datos.js): datos del huerto del usuario con sesion, guardados con la clave `huerto_datos_<idUsuario>`.
 
+```mermaid
+flowchart LR
+  subgraph PA[Pantallas]
+    R[Resumen]
+    P[Parcelas, Siembras, Riegos, Cosechas]
+    T[Temporadas y Comparar]
+    PE[Perfil y Admin]
+  end
+  subgraph ES[Estado]
+    CU[CuentaProvider: usuarios, sesion y precios]
+    DA[DatosProvider: datos del huerto]
+  end
+  subgraph LO[Logica sin React]
+    CA[calculos, estadisticas, graficas]
+    CO[consejos, cultivos, avisos]
+    TI[tiempo, ubicacion]
+    EX[csv, copia, informe, pdf]
+  end
+  PA --> ES
+  PA --> LO
+  ES --> AS[(AsyncStorage)]
+  TI --> OM{{Open-Meteo}}
+  CO --> NO{{Notificaciones del movil}}
+```
+
 La logica que se puede probar (calculos, fechas, tiempo, claves, copia) esta en modulos sin React, separada de las pantallas.
 
 ## Modelo de datos
 
 ```
-Usuario     id, usuario, nombre, clave, sal, v, rol (admin | usuario), idioma, tema, avisos, bienvenida, creado, legal
+Usuario     id, usuario, nombre, clave, sal, v, rol (admin | usuario), idioma, tema, texto, avisos, bienvenida, creado, legal
 Temporada   id, nombre, inicio, fin
 Parcela     id, nombre, metros, ubicacion, aireLibre (si | no), gastos, notas
 Siembra     id, cultivo, parcelaId, temporadaId, fecha, cantidad, notas
 Riego       id, parcelaId, fecha, litros, metodo
 Cosecha     id, siembraId, fecha, kilos, notas
+Ajustes     ciudad (nombre, latitud, longitud), lluvias (mm por dia, ultimos 30 dias)
+Config      precios (EUR/kg por cultivo), versionPrecios, precioAgua (EUR/m3), impuestos (%)
 ```
 
 Las fechas se guardan en ISO (AAAA-MM-DD) y se muestran como DD/MM/AAAA. Al borrar una parcela, siembra o temporada se borra en cascada lo que depende de ella.
@@ -223,7 +266,7 @@ beneficio = kilos x precio de mercado
           - impuestos (porcentaje sobre el beneficio positivo)
 ```
 
-Esta en `src/calculos.js`. Los precios los pone el administrador.
+Esta en `src/calculos.js`. Los precios de mercado son reales (ver [Fuentes de datos](#fuentes-de-datos)) y el administrador los puede cambiar. Si cambian los precios de la app, los que el admin no habia tocado se actualizan solos.
 
 ## Idiomas
 
@@ -254,14 +297,26 @@ El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-leg
 
 ## Hoja de ruta
 
-- API REST en AWS (region de la UE) para sincronizar los datos entre dispositivos, con HTTPS, datos cifrados, autenticacion con token y endpoints para exportar y borrar la cuenta. Los requisitos estan en `docs/cumplimiento-legal.md`.
-- Formulas de beneficio definitivas.
-- Fotos en siembras y cosechas.
-- Recordatorio de siembra segun el calendario de cultivos.
+Hecho
+
+- [x] Parcelas, siembras, riegos, cosechas y temporadas con buscador y filtros.
+- [x] Tiempo, lluvia como riego y avisos de riego en el movil.
+- [x] Calendario de cultivos, rotacion y plantas amigas.
+- [x] Beneficio con precios reales, PDF y comparar temporadas.
+- [x] Espanol e ingles, modo oscuro, tamano del texto y accesibilidad.
+- [x] Tests, pruebas de principio a fin y GitHub Actions.
+
+Pendiente
+
+- [ ] API REST en AWS (region de la UE) para sincronizar los datos entre dispositivos, con HTTPS, datos cifrados, autenticacion con token y endpoints para exportar y borrar la cuenta. Los requisitos estan en `docs/cumplimiento-legal.md`.
+- [ ] Formulas de beneficio definitivas.
+- [ ] APK instalable sin Expo Go.
+- [ ] Fotos en siembras y cosechas.
+- [ ] Recordatorio de siembra segun el calendario de cultivos.
 
 ## Convenciones del proyecto
 
 - Codigo en espanol, sin comentarios, sin acentos ni caracteres especiales en codigo y textos de la app.
 - Un commit por cada mejora, con mensaje corto en espanol.
-- Antes de subir: `npm test` tiene que pasar entero.
+- Antes de subir: `npm test` tiene que pasar entero, y `npm run e2e` si se tocan pantallas.
 - Los cambios de cada version se apuntan en [CHANGELOG.md](CHANGELOG.md).
