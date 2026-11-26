@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, SafeAreaView, StatusBar as RNStatusBar, Text, useColorScheme, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, Text, useColorScheme, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { DatosProvider, useDatos } from './src/datos';
@@ -15,6 +16,7 @@ import Riegos from './src/pantallas/Riegos';
 import Cosechas from './src/pantallas/Cosechas';
 import Temporadas from './src/pantallas/Temporadas';
 import { ponerIdioma, t } from './src/idioma';
+import { programarAvisos } from './src/avisos';
 
 const pestanas = [
   { clave: 'resumen', texto: 'Inicio', icono: 'home', Pantalla: Resumen },
@@ -26,8 +28,14 @@ const pestanas = [
 ];
 
 function Contenido() {
-  const { cargado } = useDatos();
+  const { cargado, datos } = useDatos();
   const { usuario, marcarBienvenida } = useCuenta();
+  const avisos = usuario ? usuario.avisos : undefined;
+
+  useEffect(() => {
+    if (!cargado || avisos === undefined) return;
+    programarAvisos(datos, avisos).catch(() => {});
+  }, [cargado, datos, avisos]);
   const [actual, setActual] = useState('resumen');
   const [perfil, setPerfil] = useState(false);
   const { Pantalla } = pestanas.find((p) => p.clave === actual);
@@ -91,7 +99,7 @@ function Marco() {
   const actual = elegirTema(usuario && usuario.tema, sistema);
   ponerTema(actual);
   return (
-    <SafeAreaView key={actual} style={{ flex: 1, backgroundColor: colores.fondo, paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0 }}>
+    <SafeAreaView key={actual} style={{ flex: 1, backgroundColor: colores.fondo }}>
       <View style={{ flex: 1, width: '100%', maxWidth: 900, alignSelf: 'center' }}>
         <Sesion />
       </View>
@@ -102,8 +110,10 @@ function Marco() {
 
 export default function App() {
   return (
-    <CuentaProvider>
-      <Marco />
-    </CuentaProvider>
+    <SafeAreaProvider>
+      <CuentaProvider>
+        <Marco />
+      </CuentaProvider>
+    </SafeAreaProvider>
   );
 }

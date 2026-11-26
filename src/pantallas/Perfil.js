@@ -11,9 +11,10 @@ import { exportarCopia, importarCopia } from '../copia';
 import { IDIOMAS, t } from '../idioma';
 import Chips from '../componentes/Chips';
 import Legal from './Legal';
+import { DIAS_AVISO_RIEGO, HORA_AVISO, pedirPermiso, probarAviso } from '../avisos';
 
 export default function Perfil({ onCerrar }) {
-  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarNombre, borrarMiCuenta } = useCuenta();
+  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarAvisos, cambiarNombre, borrarMiCuenta } = useCuenta();
   const [nombre, setNombre] = useState(usuario.nombre);
   const [avisoNombre, setAvisoNombre] = useState(null);
   const [claveBorrar, setClaveBorrar] = useState('');
@@ -22,6 +23,7 @@ export default function Perfil({ onCerrar }) {
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');
   const [mensaje, setMensaje] = useState(null);
+  const [avisoRiego, setAvisoRiego] = useState('');
   const { datos, guardarAjustes, reemplazar } = useDatos();
   const [textoCopia, setTextoCopia] = useState('');
   const [avisoCopia, setAvisoCopia] = useState(null);
@@ -128,6 +130,30 @@ export default function Perfil({ onCerrar }) {
     }
   }
 
+  async function cambiarRiego(valor) {
+    setAvisoRiego('');
+    if (valor === 'no') {
+      cambiarAvisos(usuario.id, false);
+      return;
+    }
+    try {
+      const permitido = await pedirPermiso();
+      if (permitido) cambiarAvisos(usuario.id, true);
+      else setAvisoRiego(t('Sin permiso para mostrar avisos. Activalo en los ajustes del movil.'));
+    } catch (e) {
+      setAvisoRiego(t('No se pudieron activar los avisos.'));
+    }
+  }
+
+  async function probarRiego() {
+    try {
+      await probarAviso(datos);
+      setAvisoRiego(t('Te llegara un aviso en unos segundos.'));
+    } catch (e) {
+      setAvisoRiego(t('No se pudieron activar los avisos.'));
+    }
+  }
+
   return (
     <Modal visible animationType="none" onRequestClose={onCerrar}>
       <ScrollView style={{ flex: 1, backgroundColor: colores.fondo }} contentContainerStyle={{ width: '100%', maxWidth: 900, alignSelf: 'center', padding: 16, paddingTop: 48, paddingBottom: 40 }}>
@@ -176,6 +202,34 @@ export default function Perfil({ onCerrar }) {
               abajo={0}
             />
           </View>
+        </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo}>{t('Avisos de riego')}</Text>
+          <Text style={estilos.tarjetaTexto}>
+            {Platform.OS === 'web'
+              ? t('Los avisos solo funcionan en el movil.')
+              : t('Te avisamos a las') + ' ' + HORA_AVISO + ':00 ' + t('si una parcela lleva') + ' ' + DIAS_AVISO_RIEGO + ' ' + t('dias o mas sin regar.')}
+          </Text>
+          {Platform.OS === 'web' ? null : (
+            <View style={{ marginTop: 10 }}>
+              <Chips
+                opciones={[
+                  { id: 'no', texto: t('Desactivados') },
+                  { id: 'si', texto: t('Activados') },
+                ]}
+                valor={usuario.avisos ? 'si' : 'no'}
+                onCambiar={cambiarRiego}
+                abajo={0}
+              />
+              {usuario.avisos ? (
+                <Pressable style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={probarRiego}>
+                  <Text style={estilos.botonSecundarioTexto}>{t('Probar aviso')}</Text>
+                </Pressable>
+              ) : null}
+              {avisoRiego ? <Text style={[estilos.tarjetaTexto, { marginTop: 10 }]}>{avisoRiego}</Text> : null}
+            </View>
+          )}
         </View>
 
         <View style={estilos.tarjeta}>

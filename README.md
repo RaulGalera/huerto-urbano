@@ -6,7 +6,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
-![Tests](https://img.shields.io/badge/tests-57_pasan-2E7D32)
+![Tests](https://img.shields.io/badge/tests-64_pasan-2E7D32)
 ![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
 
 ## Indice
@@ -43,6 +43,7 @@ Pantalla de inicio
 - Calendario del huerto: siembras listas para cosechar, proximas cosechas y que sembrar este mes.
 - Graficas: kilos por cultivo y por mes, agua por parcela y beneficio por temporada.
 - Beneficio de la temporada, total y por parcela, descargable en PDF.
+- Avisos de riego en el movil: si una parcela lleva 3 dias o mas sin regar te llega una notificacion a las 9:00. Se activan en Mi cuenta y tienen un boton para probarlos.
 
 Cuentas
 
@@ -70,6 +71,8 @@ Modo admin
 | Ubicacion | expo-location |
 | Iconos | @expo/vector-icons (Ionicons) |
 | PDF | expo-print y expo-sharing |
+| Avisos | expo-notifications (notificaciones locales) |
+| Zona segura | react-native-safe-area-context |
 | Tests | Jest con jest-expo y Testing Library |
 
 No usa librerias de navegacion: las pestanas y los modales estan hechos a mano para que la app sea ligera y facil de seguir.
@@ -107,7 +110,7 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 npm test
 ```
 
-57 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login y registro) con Testing Library, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
+64 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
 
 ## Arquitectura
 
@@ -123,6 +126,7 @@ src/
   tiempo.js               Prevision de Open-Meteo y consejo de riego
   ubicacion.js            GPS con expo-location
   copia.js                Exportar y restaurar datos, filtro del buscador
+  avisos.js               Avisos de riego programados en el movil
   idioma.js               Textos en espanol e ingles
   legal.js                Privacidad, aviso legal, condiciones, accesibilidad
   util.js                 Fechas, numeros y ayudas varias

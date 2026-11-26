@@ -9,8 +9,22 @@ import Login from '../src/pantallas/Login';
 import Comparar from '../src/pantallas/Comparar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CuentaProvider, useCuenta } from '../src/cuenta';
+import { DatosProvider } from '../src/datos';
+import Perfil from '../src/pantallas/Perfil';
+import * as Notificaciones from 'expo-notifications';
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+  setNotificationChannelAsync: jest.fn(),
+  AndroidImportance: { DEFAULT: 3 },
+  SchedulableTriggerInputTypes: { DATE: 'date', TIME_INTERVAL: 'timeInterval' },
+  getAllScheduledNotificationsAsync: jest.fn(async () => []),
+  cancelScheduledNotificationAsync: jest.fn(),
+  getPermissionsAsync: jest.fn(async () => ({ granted: false })),
+  requestPermissionsAsync: jest.fn(async () => ({ granted: true })),
+  scheduleNotificationAsync: jest.fn(),
+}));
 jest.mock('@react-native-async-storage/async-storage', () => require('@react-native-async-storage/async-storage/jest/async-storage-mock'));
 
 const datos = {
@@ -160,5 +174,35 @@ describe('Login', () => {
     await fireEvent.press(screen.getByText('He leido y acepto la politica de privacidad y las condiciones de uso'));
     await fireEvent.press(screen.getByText('Crear cuenta'));
     expect(await screen.findByText('Dentro Ana')).toBeTruthy();
+  });
+});
+
+describe('Avisos de riego en Mi cuenta', () => {
+  beforeEach(() => AsyncStorage.clear());
+
+  function Prueba() {
+    const { cargado, usuario } = useCuenta();
+    if (!cargado) return null;
+    if (!usuario) return <Login />;
+    return (
+      <DatosProvider usuarioId={usuario.id}>
+        <Perfil onCerrar={() => {}} />
+      </DatosProvider>
+    );
+  }
+
+  test('se activan pidiendo permiso y se puede probar un aviso', async () => {
+    await render(<CuentaProvider><Prueba /></CuentaProvider>);
+    await screen.findByText('Entrar');
+    await fireEvent.changeText(screen.getByLabelText('Usuario'), 'admin');
+    await fireEvent.changeText(screen.getByLabelText('Contrasena'), 'admin123');
+    await fireEvent.press(screen.getByText('Entrar'));
+    expect(await screen.findByText('Avisos de riego')).toBeTruthy();
+    expect(screen.queryByText('Probar aviso')).toBeNull();
+    await fireEvent.press(screen.getByText('Activados'));
+    expect(Notificaciones.requestPermissionsAsync).toHaveBeenCalled();
+    await fireEvent.press(await screen.findByText('Probar aviso'));
+    expect(Notificaciones.scheduleNotificationAsync).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText('Te llegara un aviso en unos segundos.')).toBeTruthy();
   });
 });

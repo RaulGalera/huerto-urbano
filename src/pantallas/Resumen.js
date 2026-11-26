@@ -3,7 +3,8 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estiloChip, estilos } from '../estilos';
 import { hoy, useDatos } from '../datos';
-import { nombrePor, numero, ordenarPorFecha, temporadaActual, ultimoRiego } from '../util';
+import { nombrePor, numero, ordenarPorFecha, temporadaActual } from '../util';
+import { DIAS_AVISO_RIEGO, sinRegar } from '../avisos';
 import { useCuenta } from '../cuenta';
 import { calcularBeneficio, euros } from '../calculos';
 import Tiempo from '../componentes/Tiempo';
@@ -12,8 +13,6 @@ import { estadoSiembra, nombreMes, paraSembrar } from '../cultivos';
 import { t } from '../idioma';
 import { htmlBalance } from '../informe';
 import { descargarPdf, nombrePdf } from '../pdf';
-
-const DIAS_AVISO_RIEGO = 3;
 
 function Dato({ valor, texto }) {
   return (
@@ -67,9 +66,7 @@ export default function Resumen({ onPerfil }) {
     }
   }
 
-  const avisos = datos.parcelas
-    .map((p) => ({ parcela: p, dias: ultimoRiego(datos.riegos, p.id) }))
-    .filter((a) => a.dias === null || a.dias >= DIAS_AVISO_RIEGO);
+  const avisos = sinRegar(datos, hoy());
 
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 30 }}>
