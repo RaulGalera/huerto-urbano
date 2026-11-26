@@ -1,15 +1,12 @@
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Directory, File, Paths } from 'expo-file-system';
 
-const CLAVE_CARPETA = 'huerto_carpeta_pdf';
-
 export function nombrePdf(titulo, fecha) {
   const limpio = titulo
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
@@ -34,41 +31,14 @@ function imprimirWeb(html) {
   }, 200);
 }
 
-async function carpetaGuardada() {
-  try {
-    const uri = await AsyncStorage.getItem(CLAVE_CARPETA);
-    return uri ? new Directory(uri) : null;
-  } catch (e) {
-    return null;
-  }
-}
-
-async function guardarEn(carpeta, nombre, bytes) {
-  const destino = carpeta.createFile(nombre, 'application/pdf');
-  await destino.write(bytes);
-}
-
-async function guardarAndroid(origen, nombre) {
-  const bytes = await origen.bytes();
-  const anterior = await carpetaGuardada();
-  if (anterior) {
-    try {
-      await guardarEn(anterior, nombre, bytes);
-      return 'guardado';
-    } catch (e) {
-      await AsyncStorage.removeItem(CLAVE_CARPETA);
-    }
-  }
-  let carpeta;
-  try {
-    carpeta = await Directory.pickDirectoryAsync();
-  } catch (e) {
-    return 'cancelado';
-  }
-  if (!carpeta) return 'cancelado';
-  await guardarEn(carpeta, nombre, bytes);
-  await AsyncStorage.setItem(CLAVE_CARPETA, carpeta.uri);
-  return 'guardado';
+async function guardarEnLaApp(base64, nombre) {
+  const carpeta = new Directory(Paths.document, 'informes');
+  if (!carpeta.exists) carpeta.create();
+  const destino = new File(carpeta, nombre);
+  if (destino.exists) destino.delete();
+  destino.create();
+  await destino.write(base64, { encoding: 'base64' });
+  return destino;
 }
 
 export async function descargarPdf(html, nombre) {
@@ -76,12 +46,13 @@ export async function descargarPdf(html, nombre) {
     imprimirWeb(html);
     return 'web';
   }
-  const { uri } = await Print.printToFileAsync({ html });
-  const origen = new File(uri);
-  if (Platform.OS === 'android') return guardarAndroid(origen, nombre);
-  const copia = new File(Paths.document, nombre);
-  if (copia.exists) copia.delete();
-  origen.copy(copia);
-  await Sharing.shareAsync(copia.uri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf' });
-  return 'compartido';
+  const { base64 } = await Print.printToFileAsync({ html, base64: true });
+  const destino = await guardarEnLaApp(base64, nombre);
+  try {
+    await destino.preview();
+    return 'abierto';
+  } catch (e) {
+    await Sharing.shareAsync(destino.uri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf' });
+    return 'compartido';
+  }
 }
