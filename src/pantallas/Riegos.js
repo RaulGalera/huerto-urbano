@@ -1,18 +1,20 @@
 import ListaEditable from '../componentes/ListaEditable';
 import { hoy, useDatos } from '../datos';
 import { colores } from '../estilos';
-import { nombrePor, numero, ordenarPorFecha, verFecha } from '../util';
+import { nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
 import { t } from '../idioma';
 
 export default function Riegos() {
   const { datos } = useDatos();
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
+  const actual = temporadaActual(datos.temporadas, hoy());
   const filtros = [
     { clave: 'parcela', titulo: t('Parcela'), opciones: datos.parcelas.map((p) => ({ id: p.id, texto: p.nombre })), aplica: (r, id) => r.parcelaId === id },
     {
       clave: 'temporada',
       titulo: t('Temporada'),
       opciones: temporadas.map((x) => ({ id: x.id, texto: x.nombre })),
+      defecto: actual ? actual.id : 'todas',
       aplica: (r, id) => {
         const x = temporadas.find((y) => y.id === id);
         return r.fecha >= x.inicio && r.fecha <= x.fin;

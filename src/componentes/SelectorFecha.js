@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
-import { diasDelMes, leerFecha, verFecha } from '../util';
+import { diasDelMes, fechaLocal, leerFecha, verFecha } from '../util';
 import { idioma, t } from '../idioma';
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const SEMANA = { es: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'] };
 
 function hoyIso() {
-  return new Date().toISOString().slice(0, 10);
+  return fechaLocal();
 }
 
 function aIso(anio, mes, dia) {

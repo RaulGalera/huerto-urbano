@@ -11,7 +11,8 @@ import { exportarCopia, importarCopia } from '../copia';
 import { IDIOMAS, t } from '../idioma';
 import Chips from '../componentes/Chips';
 import Legal from './Legal';
-import { DIAS_AVISO_RIEGO, HORA_AVISO, pedirPermiso, probarAviso } from '../avisos';
+import { DIAS_AVISO_RIEGO, HORA_AVISO, pedirPermiso, probarAviso, programarAvisos } from '../avisos';
+import { fechaLocal } from '../util';
 
 export default function Perfil({ onCerrar }) {
   const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarAvisos, cambiarNombre, borrarMiCuenta } = useCuenta();
@@ -58,7 +59,7 @@ export default function Perfil({ onCerrar }) {
 
   async function exportar() {
     const texto = exportarCopia(datos);
-    const nombre = 'huerto-' + new Date().toISOString().slice(0, 10) + '.json';
+    const nombre = 'huerto-' + fechaLocal() + '.json';
     if (Platform.OS === 'web') {
       const url = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
       const a = document.createElement('a');
@@ -105,11 +106,21 @@ export default function Perfil({ onCerrar }) {
     setAvisoNombre(error ? { texto: t(error), color: colores.rojo } : { texto: t('Nombre guardado'), color: colores.verde });
   }
 
+  function quitarAvisos() {
+    if (usuario.avisos) programarAvisos(datos, false).catch(() => {});
+  }
+
+  function salirDeLaCuenta() {
+    quitarAvisos();
+    salir();
+  }
+
   function borrarCuenta() {
     const pregunta = t('Se borrara tu cuenta y todos tus datos. No se puede deshacer. Continuar?');
     const hacer = () => {
       const error = borrarMiCuenta(claveBorrar);
       if (error) setAvisoBorrar(t(error));
+      else quitarAvisos();
     };
     if (Platform.OS === 'web') {
       if (window.confirm(pregunta)) hacer();
@@ -141,7 +152,7 @@ export default function Perfil({ onCerrar }) {
       if (permitido) cambiarAvisos(usuario.id, true);
       else setAvisoRiego(t('Sin permiso para mostrar avisos. Activalo en los ajustes del movil.'));
     } catch (e) {
-      setAvisoRiego(t('No se pudieron activar los avisos.'));
+      setAvisoRiego(t('No se pudieron activar los avisos.') + ' ' + String((e && e.message) || e));
     }
   }
 
@@ -150,7 +161,7 @@ export default function Perfil({ onCerrar }) {
       await probarAviso(datos);
       setAvisoRiego(t('Te llegara un aviso en unos segundos.'));
     } catch (e) {
-      setAvisoRiego(t('No se pudieron activar los avisos.'));
+      setAvisoRiego(t('No se pudieron activar los avisos.') + ' ' + String((e && e.message) || e));
     }
   }
 
@@ -328,7 +339,7 @@ export default function Perfil({ onCerrar }) {
 
         {esAdmin ? <Admin /> : null}
 
-        <Pressable style={[estilos.boton, estilos.fila, { gap: 8, backgroundColor: colores.rojo, marginTop: 10 }]} onPress={salir}>
+        <Pressable style={[estilos.boton, estilos.fila, { gap: 8, backgroundColor: colores.rojo, marginTop: 10 }]} onPress={salirDeLaCuenta}>
           <Ionicons name="log-out-outline" size={20} color={colores.blanco} />
           <Text style={estilos.botonTexto}>{t('Cerrar sesion')}</Text>
         </Pressable>

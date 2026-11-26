@@ -11,7 +11,8 @@ jest.mock('expo-notifications', () => ({
 }));
 
 import * as N from 'expo-notifications';
-import { fechaLocal, planAvisos, programarAvisos, sinRegar, textoAviso } from '../src/avisos';
+import { planAvisos, programarAvisos, sinRegar, textoAviso } from '../src/avisos';
+import { fechaLocal } from '../src/util';
 
 const datos = {
   parcelas: [

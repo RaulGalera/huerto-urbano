@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { ordenarPorFecha } from './util';
+import { fechaLocal, ordenarPorFecha } from './util';
 import { t } from './idioma';
 
 export const DIAS_AVISO_RIEGO = 3;
@@ -10,11 +10,6 @@ const CANAL = 'riego';
 
 function diasEntre(desde, hasta) {
   return Math.round((new Date(hasta + 'T00:00:00') - new Date(desde + 'T00:00:00')) / 86400000);
-}
-
-export function fechaLocal(d) {
-  const dos = (n) => String(n).padStart(2, '0');
-  return d.getFullYear() + '-' + dos(d.getMonth() + 1) + '-' + dos(d.getDate());
 }
 
 export function sinRegar(datos, fecha) {
@@ -55,9 +50,10 @@ function modulo() {
 }
 
 async function prepararCanal(N) {
-  if (Platform.OS === 'android') {
+  if (Platform.OS !== 'android') return;
+  try {
     await N.setNotificationChannelAsync(CANAL, { name: t('Avisos de riego'), importance: N.AndroidImportance.DEFAULT });
-  }
+  } catch (e) {}
 }
 
 export async function pedirPermiso() {

@@ -6,7 +6,7 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
-![Tests](https://img.shields.io/badge/tests-64_pasan-2E7D32)
+![Tests](https://img.shields.io/badge/tests-67_pasan-2E7D32)
 ![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
 
 ## Indice
@@ -43,7 +43,6 @@ Pantalla de inicio
 - Calendario del huerto: siembras listas para cosechar, proximas cosechas y que sembrar este mes.
 - Graficas: kilos por cultivo y por mes, agua por parcela y beneficio por temporada.
 - Beneficio de la temporada, total y por parcela, descargable en PDF.
-- Avisos de riego en el movil: si una parcela lleva 3 dias o mas sin regar te llega una notificacion a las 9:00. Se activan en Mi cuenta y tienen un boton para probarlos.
 
 Cuentas
 
@@ -51,7 +50,8 @@ Cuentas
 - Guia de bienvenida de tres pasos la primera vez que se entra.
 - Idioma elegible al registrarse (espanol por defecto o ingles) y cambiable despues.
 - Modo oscuro: como el movil, claro u oscuro.
-- Mi cuenta: cambiar nombre, contrasena, idioma y ubicacion, copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
+- Avisos de riego en el movil: si una parcela lleva 3 dias o mas sin regar te llega una notificacion a las 9:00. Se activan en Mi cuenta y tienen un boton para probarlos.
+- Mi cuenta: cambiar nombre, contrasena, idioma, apariencia, avisos y ubicacion, copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
 
 Modo admin
 
@@ -110,7 +110,7 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 npm test
 ```
 
-64 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros y graficas.
+67 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros, graficas y datos de ejemplo.
 
 ## Arquitectura
 
@@ -120,7 +120,13 @@ src/
   cuenta.js               Usuarios, sesion, config de precios, borrado de cuenta
   datos.js                Datos de cada usuario (guardar, borrar, reemplazar)
   claves.js               Contrasenas con sal y migracion de las antiguas
+  sha256.js               SHA-256 en JavaScript para las contrasenas
   calculos.js             Beneficio por temporada y por parcela
+  estadisticas.js         Resumen y comparacion de temporadas
+  graficas.js             Datos de las graficas del inicio
+  informe.js              HTML del balance para el PDF
+  pdf.js                  Crear y abrir el PDF
+  ejemplo.js              Huerto de ejemplo para demostraciones
   precios.js              Precios de mercado por defecto
   cultivos.js             Dias hasta cosecha y meses de siembra
   tiempo.js               Prevision de Open-Meteo y consejo de riego
@@ -130,9 +136,10 @@ src/
   idioma.js               Textos en espanol e ingles
   legal.js                Privacidad, aviso legal, condiciones, accesibilidad
   util.js                 Fechas, numeros y ayudas varias
-  componentes/            ListaEditable, Formulario, Chips, Casilla, SelectorFecha, Tiempo
+  componentes/            ListaEditable, Formulario, Filtros, Chips, Casilla, SelectorFecha,
+                          Tiempo, Graficas, Bienvenida
   pantallas/              Resumen, Parcelas, Siembras, Riegos, Cosechas, Temporadas,
-                          Login, Perfil, Admin, Legal
+                          Comparar, Login, Perfil, Admin, Legal
 __tests__/                Tests de Jest
 docs/                     Documentacion (cumplimiento legal)
 ```
@@ -147,7 +154,7 @@ La logica que se puede probar (calculos, fechas, tiempo, claves, copia) esta en 
 ## Modelo de datos
 
 ```
-Usuario     id, usuario, nombre, clave, sal, v, rol (admin | usuario), idioma, creado, legal
+Usuario     id, usuario, nombre, clave, sal, v, rol (admin | usuario), idioma, tema, avisos, bienvenida, creado, legal
 Temporada   id, nombre, inicio, fin
 Parcela     id, nombre, metros, ubicacion, gastos, notas
 Siembra     id, cultivo, parcelaId, temporadaId, fecha, cantidad, notas
@@ -195,7 +202,7 @@ El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-leg
 
 - API REST en AWS (region de la UE) para sincronizar los datos entre dispositivos, con HTTPS, datos cifrados, autenticacion con token y endpoints para exportar y borrar la cuenta. Los requisitos estan en `docs/cumplimiento-legal.md`.
 - Formulas de beneficio definitivas.
-- Notificaciones de riego.
+- Recordatorio de siembra segun el calendario de cultivos.
 
 ## Convenciones del proyecto
 

@@ -1,6 +1,6 @@
 import ListaEditable from '../componentes/ListaEditable';
 import { hoy, useDatos } from '../datos';
-import { claveCultivo, cultivosDe, nombrePor, numero, ordenarPorFecha, textoSiembra, verFecha } from '../util';
+import { claveCultivo, cultivosDe, nombrePor, numero, ordenarPorFecha, temporadaActual, textoSiembra, verFecha } from '../util';
 import { t } from '../idioma';
 
 export default function Cosechas() {
@@ -17,11 +17,12 @@ export default function Cosechas() {
   }
 
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
+  const actual = temporadaActual(datos.temporadas, hoy());
   const cosechadas = datos.siembras.filter((s) => datos.cosechas.some((c) => c.siembraId === s.id));
   const filtros = [
     { clave: 'verdura', titulo: t('Verdura'), opciones: cultivosDe(cosechadas), aplica: (c, id) => siembra(c) && claveCultivo(siembra(c).cultivo) === id },
     { clave: 'parcela', titulo: t('Parcela'), opciones: datos.parcelas.map((p) => ({ id: p.id, texto: p.nombre })), aplica: (c, id) => siembra(c) && siembra(c).parcelaId === id },
-    { clave: 'temporada', titulo: t('Temporada'), opciones: temporadas.map((x) => ({ id: x.id, texto: x.nombre })), aplica: (c, id) => siembra(c) && siembra(c).temporadaId === id },
+    { clave: 'temporada', titulo: t('Temporada'), opciones: temporadas.map((x) => ({ id: x.id, texto: x.nombre })), defecto: actual ? actual.id : 'todas', aplica: (c, id) => siembra(c) && siembra(c).temporadaId === id },
   ];
   function resumen(lista) {
     const kilos = lista.reduce((a, c) => a + (Number(c.kilos) || 0), 0);

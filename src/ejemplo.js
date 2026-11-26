@@ -51,7 +51,7 @@ export function crearDatosEjemplo(hoy) {
     [macetas, 1, 3, 'Regadera', 0],
   ];
   plan.forEach(([p, cada, litros, metodo, ultimo]) => {
-    for (let d = -84; d <= -ultimo; d += cada) {
+    for (let d = -84; d < -ultimo; d += cada) {
       riegos.push({ id: id(), parcelaId: p.id, fecha: dia(hoy, d), litros, metodo });
     }
     riegos.push({ id: id(), parcelaId: p.id, fecha: dia(hoy, -ultimo), litros, metodo });

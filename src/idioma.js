@@ -77,6 +77,7 @@ const textos = {
     'Hola,': 'Hi,',
     'Crea una temporada en la pestana Temp. para ver el resumen.': 'Create a season in the Seasons tab to see the summary.',
     'Avisos de riego': 'Watering reminders',
+    'Sin asignar': 'Unassigned',
     'Toca regar': 'Time to water',
     'Todas tus parcelas estan regadas.': 'All your plots are watered.',
     'Los avisos solo funcionan en el movil.': 'Reminders only work on the phone.',

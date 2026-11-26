@@ -1,4 +1,4 @@
-import { leerFecha, numero, verFecha } from '../src/util';
+import { fechaLocal, leerFecha, numero, verFecha } from '../src/util';
 import { normalizar, precioDe } from '../src/precios';
 
 test('convierte fechas entre DD/MM/AAAA e ISO', () => {
@@ -29,4 +29,9 @@ test('cultivosDe junta nombres repetidos y los ordena', () => {
     { id: 'lechuga', texto: 'Lechuga' },
     { id: 'tomate', texto: 'Tomate' },
   ]);
+});
+
+test('fechaLocal usa la fecha del movil, no la de UTC', () => {
+  expect(fechaLocal(new Date(2026, 0, 5, 0, 30))).toBe('2026-01-05');
+  expect(fechaLocal(new Date(2026, 11, 31, 23, 59))).toBe('2026-12-31');
 });

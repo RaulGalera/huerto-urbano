@@ -27,7 +27,7 @@ const pestanas = [
   { clave: 'temporadas', texto: 'Temp.', icono: 'calendar', Pantalla: Temporadas },
 ];
 
-function Contenido() {
+function Contenido({ perfil, setPerfil }) {
   const { cargado, datos } = useDatos();
   const { usuario, marcarBienvenida } = useCuenta();
   const avisos = usuario ? usuario.avisos : undefined;
@@ -37,7 +37,6 @@ function Contenido() {
     programarAvisos(datos, avisos).catch(() => {});
   }, [cargado, datos, avisos]);
   const [actual, setActual] = useState('resumen');
-  const [perfil, setPerfil] = useState(false);
   const { Pantalla } = pestanas.find((p) => p.clave === actual);
 
   if (!cargado) {
@@ -70,7 +69,7 @@ function Contenido() {
   );
 }
 
-function Sesion() {
+function Sesion({ perfil, setPerfil }) {
   const { cargado, usuario, usuarios } = useCuenta();
   if (usuario) ponerIdioma(usuario.idioma || 'es');
   if (!cargado) {
@@ -83,7 +82,7 @@ function Sesion() {
   if (!usuario) return <Login />;
   return (
     <DatosProvider key={usuario.id} usuarioId={usuario.id} migrar={usuarios[0] && usuarios[0].id === usuario.id}>
-      <Contenido key={usuario.idioma || 'es'} />
+      <Contenido key={usuario.idioma || 'es'} perfil={perfil} setPerfil={setPerfil} />
     </DatosProvider>
   );
 }
@@ -96,12 +95,17 @@ export function elegirTema(preferencia, sistema) {
 function Marco() {
   const { usuario } = useCuenta();
   const sistema = useColorScheme();
+  const [perfil, setPerfil] = useState(false);
+  const id = usuario ? usuario.id : null;
+  useEffect(() => {
+    setPerfil(false);
+  }, [id]);
   const actual = elegirTema(usuario && usuario.tema, sistema);
   ponerTema(actual);
   return (
     <SafeAreaView key={actual} style={{ flex: 1, backgroundColor: colores.fondo }}>
       <View style={{ flex: 1, width: '100%', maxWidth: 900, alignSelf: 'center' }}>
-        <Sesion />
+        <Sesion perfil={perfil} setPerfil={setPerfil} />
       </View>
       <StatusBar style={actual === 'oscuro' ? 'light' : 'dark'} />
     </SafeAreaView>

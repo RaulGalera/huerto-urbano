@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fechaLocal } from './util';
 
 const CLAVE_ANTIGUA = 'huerto_datos_v1';
 
@@ -28,7 +29,7 @@ export function nuevoId() {
 }
 
 export function hoy() {
-  return new Date().toISOString().slice(0, 10);
+  return fechaLocal();
 }
 
 export function DatosProvider({ usuarioId, migrar, children }) {

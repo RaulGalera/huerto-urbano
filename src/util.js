@@ -1,12 +1,19 @@
+import { t } from './idioma';
+
+export function fechaLocal(d = new Date()) {
+  const dos = (n) => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + dos(d.getMonth() + 1) + '-' + dos(d.getDate());
+}
+
 export function nombrePor(lista, id, campo = 'nombre') {
   const x = lista.find((e) => e.id === id);
-  return x ? x[campo] : 'Sin asignar';
+  return x ? x[campo] : t('Sin asignar');
 }
 
 export function diasDesde(fecha) {
   if (!fecha) return null;
   const a = new Date(fecha + 'T00:00:00');
-  const b = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00');
+  const b = new Date(fechaLocal() + 'T00:00:00');
   return Math.round((b - a) / 86400000);
 }
 
@@ -45,7 +52,7 @@ export function ultimoRiego(riegos, parcelaId) {
 }
 
 export function temporadaActual(temporadas, hoy) {
-  return temporadas.find((t) => t.inicio <= hoy && hoy <= t.fin);
+  return temporadas.find((x) => x.inicio <= hoy && hoy <= x.fin);
 }
 
 export function diasDelMes(anio, mes) {

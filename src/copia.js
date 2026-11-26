@@ -1,7 +1,9 @@
+import { fechaLocal } from './util';
+
 const LISTAS = ['temporadas', 'parcelas', 'siembras', 'riegos', 'cosechas'];
 
 export function exportarCopia(datos) {
-  const copia = { app: 'huerto-urbano', version: 1, fecha: new Date().toISOString().slice(0, 10) };
+  const copia = { app: 'huerto-urbano', version: 1, fecha: fechaLocal() };
   LISTAS.forEach((l) => {
     copia[l] = datos[l] || [];
   });
