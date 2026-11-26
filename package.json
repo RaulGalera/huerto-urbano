@@ -1,7 +1,12 @@
 {
   "name": "huerto-urbano",
   "version": "1.0.0",
+  "description": "App multiplataforma para gestionar un huerto urbano: temporadas, parcelas, siembras, riegos y cosechas.",
+  "private": true,
   "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",
     "@expo/vector-icons": "^15.0.2",
@@ -26,7 +31,6 @@
     "web": "expo start --web",
     "test": "jest"
   },
-  "private": true,
   "devDependencies": {
     "@testing-library/react-native": "^14.1.0",
     "jest": "^30.5.2",

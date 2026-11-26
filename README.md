@@ -4,14 +4,23 @@ App multiplataforma para gestionar un huerto urbano: parcelas, siembras, riegos 
 
 Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Android, iOS y web (escritorio desde el navegador).
 
+[![Tests](https://github.com/RaulGalera/huerto-urbano/actions/workflows/tests.yml/badge.svg)](https://github.com/RaulGalera/huerto-urbano/actions/workflows/tests.yml)
 ![Expo SDK](https://img.shields.io/badge/Expo_SDK-58-000020)
 ![React Native](https://img.shields.io/badge/React_Native-0.88-61DAFB)
-![Tests](https://img.shields.io/badge/tests-80_pasan-2E7D32)
+![Plataformas](https://img.shields.io/badge/plataformas-Android_|_iOS_|_Web-2E7D32)
 ![Idiomas](https://img.shields.io/badge/idiomas-ES_|_EN-informational)
+
+<p align="center">
+  <img src="docs/capturas/inicio.png" width="230" alt="Pantalla de inicio" />
+  <img src="docs/capturas/consejos.png" width="230" alt="Nueva siembra con consejos" />
+  <img src="docs/capturas/oscuro.png" width="230" alt="Modo oscuro" />
+</p>
 
 ## Indice
 
+- [Prueba rapida](#prueba-rapida)
 - [Funcionalidades](#funcionalidades)
+- [Capturas](#capturas)
 - [Tecnologias](#tecnologias)
 - [Puesta en marcha](#puesta-en-marcha)
 - [Scripts](#scripts)
@@ -24,6 +33,12 @@ Proyecto final de 2 DAM. Hecha con React Native y Expo: un solo codigo para Andr
 - [Seguridad](#seguridad)
 - [Hoja de ruta](#hoja-de-ruta)
 - [Convenciones del proyecto](#convenciones-del-proyecto)
+
+## Prueba rapida
+
+1. Arranca la app (ver [Puesta en marcha](#puesta-en-marcha)).
+2. Entra con el usuario `admin` y la contrasena `admin123`.
+3. En Mi cuenta pulsa "Cargar datos de ejemplo": se crea un huerto con dos temporadas, cuatro parcelas, siembras, riegos y cosechas.
 
 ## Funcionalidades
 
@@ -61,6 +76,14 @@ Modo admin
 - Gestion de usuarios (dar o quitar admin, borrar).
 - Cargar un huerto de ejemplo para hacer demostraciones.
 
+## Capturas
+
+| Inicio | Graficas y beneficio | Comparar temporadas |
+| :---: | :---: | :---: |
+| <img src="docs/capturas/inicio.png" width="220" alt="Inicio" /> | <img src="docs/capturas/graficas.png" width="220" alt="Graficas" /> | <img src="docs/capturas/comparar.png" width="220" alt="Comparar temporadas" /> |
+| **Nueva siembra con consejos** | **Filtros** | **Modo oscuro** |
+| <img src="docs/capturas/consejos.png" width="220" alt="Consejos al sembrar" /> | <img src="docs/capturas/filtros.png" width="220" alt="Filtros" /> | <img src="docs/capturas/oscuro.png" width="220" alt="Modo oscuro" /> |
+
 ## Tecnologias
 
 | Area | Tecnologia |
@@ -80,7 +103,7 @@ No usa librerias de navegacion: las pestanas y los modales estan hechos a mano p
 
 ## Puesta en marcha
 
-Requisitos: Node.js 20 o superior y la app Expo Go en el movil (o Android Studio con un emulador).
+Requisitos: Node.js 22 (ver `.nvmrc`) y la app Expo Go en el movil (o Android Studio con un emulador).
 
 ```bash
 git clone https://github.com/RaulGalera/huerto-urbano.git
@@ -110,6 +133,8 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 ```bash
 npm test
 ```
+
+GitHub Actions ejecuta los tests en cada push y en cada pull request (`.github/workflows/tests.yml`).
 
 80 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros, graficas, datos de ejemplo, rotacion y plantas amigas, lluvia como riego y exportar a CSV.
 
@@ -145,7 +170,8 @@ src/
   pantallas/              Resumen, Parcelas, Siembras, Riegos, Cosechas, Temporadas,
                           Comparar, Login, Perfil, Admin, Legal
 __tests__/                Tests de Jest
-docs/                     Documentacion (cumplimiento legal)
+docs/                     Documentacion (cumplimiento legal) y capturas
+.github/workflows/        Tests automaticos con GitHub Actions
 ```
 
 El estado se reparte en dos Context de React:
@@ -206,6 +232,7 @@ El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-leg
 
 - API REST en AWS (region de la UE) para sincronizar los datos entre dispositivos, con HTTPS, datos cifrados, autenticacion con token y endpoints para exportar y borrar la cuenta. Los requisitos estan en `docs/cumplimiento-legal.md`.
 - Formulas de beneficio definitivas.
+- Fotos en siembras y cosechas.
 - Recordatorio de siembra segun el calendario de cultivos.
 
 ## Convenciones del proyecto
@@ -213,3 +240,4 @@ El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-leg
 - Codigo en espanol, sin comentarios, sin acentos ni caracteres especiales en codigo y textos de la app.
 - Un commit por cada mejora, con mensaje corto en espanol.
 - Antes de subir: `npm test` tiene que pasar entero.
+- Los cambios de cada version se apuntan en [CHANGELOG.md](CHANGELOG.md).
