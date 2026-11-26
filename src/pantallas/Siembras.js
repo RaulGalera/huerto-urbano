@@ -2,6 +2,7 @@ import ListaEditable from '../componentes/ListaEditable';
 import { hoy, useDatos } from '../datos';
 import { claveCultivo, cultivosDe, nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
 import { estadoSiembra } from '../cultivos';
+import { consejosSiembra } from '../consejos';
 import { colores } from '../estilos';
 import { t } from '../idioma';
 
@@ -13,7 +14,7 @@ export default function Siembras() {
   const campos = [
     { clave: 'cultivo', etiqueta: t('Cultivo'), tipo: 'texto', obligatorio: true, ejemplo: t('Ej: Tomate') },
     { clave: 'parcelaId', etiqueta: t('Parcela'), tipo: 'desplegable', obligatorio: true, opciones: datos.parcelas.map((p) => ({ valor: p.id, texto: p.nombre })) },
-    { clave: 'temporadaId', etiqueta: t('Temporada'), tipo: 'desplegable', obligatorio: true, opciones: temporadas.map((x) => ({ valor: x.id, texto: x.nombre })) },
+    { clave: 'temporadaId', etiqueta: t('Temporada'), tipo: 'desplegable', obligatorio: true, opciones: temporadas.map((x) => ({ valor: x.id, texto: x.nombre })), ayudaAqui: true },
     { clave: 'fecha', etiqueta: t('Fecha de siembra'), tipo: 'fecha', obligatorio: true },
     { clave: 'cantidad', etiqueta: t('Plantas o semillas'), tipo: 'numero' },
     { clave: 'notas', etiqueta: t('Notas'), tipo: 'largo' },
@@ -53,6 +54,7 @@ export default function Siembras() {
       textoNuevo={t('Nueva siembra')}
       tituloEditar={t('Editar siembra')}
       campos={campos}
+      ayuda={(v) => consejosSiembra(datos, v)}
       filtros={filtros}
       resumen={(lista) => lista.length + ' ' + t(lista.length === 1 ? 'siembra' : 'siembras')}
       nuevo={(f) => ({

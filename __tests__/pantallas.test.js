@@ -7,6 +7,7 @@ import Casilla from '../src/componentes/Casilla';
 import PanelFiltros, { Pastillas } from '../src/componentes/Filtros';
 import Login from '../src/pantallas/Login';
 import Comparar from '../src/pantallas/Comparar';
+import Formulario from '../src/componentes/Formulario';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CuentaProvider, useCuenta } from '../src/cuenta';
 import { DatosProvider } from '../src/datos';
@@ -205,4 +206,12 @@ describe('Avisos de riego en Mi cuenta', () => {
     expect(Notificaciones.scheduleNotificationAsync).toHaveBeenCalledTimes(1);
     expect(await screen.findByText('Te llegara un aviso en unos segundos.')).toBeTruthy();
   });
+});
+
+test('Formulario muestra los consejos segun lo que se escribe', async () => {
+  const ayuda = (v) => (v.cultivo === 'Tomate' ? [{ tono: 'mal', texto: 'Se lleva mal con Patata' }] : []);
+  await render(<Formulario titulo="Nueva siembra" campos={[{ clave: 'cultivo', etiqueta: 'Cultivo', tipo: 'texto' }]} inicial={{ cultivo: '' }} ayuda={ayuda} onGuardar={() => {}} onCerrar={() => {}} />);
+  expect(screen.queryByText('Se lleva mal con Patata')).toBeNull();
+  await fireEvent.changeText(screen.getByDisplayValue(''), 'Tomate');
+  expect(screen.getByText('Se lleva mal con Patata')).toBeTruthy();
 });

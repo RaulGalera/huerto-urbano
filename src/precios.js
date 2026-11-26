@@ -34,16 +34,21 @@ export function normalizar(texto) {
   return String(texto || '')
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-export function buscarEnCatalogo(catalogo, nombre) {
+export function claveEnCatalogo(catalogo, nombre) {
   const n = normalizar(nombre);
   const opciones = [n, n.replace(/s$/, ''), n.replace(/es$/, '')];
   const clave = opciones.find((o) => catalogo[o] !== undefined);
-  return clave === undefined ? null : catalogo[clave];
+  return clave === undefined ? null : clave;
+}
+
+export function buscarEnCatalogo(catalogo, nombre) {
+  const clave = claveEnCatalogo(catalogo, nombre);
+  return clave === null ? null : catalogo[clave];
 }
 
 export function precioDe(config, cultivo) {

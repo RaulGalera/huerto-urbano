@@ -34,5 +34,5 @@ export function filtrar(items, texto, aTexto) {
 }
 
 function quitarAcentos(s) {
-  return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }

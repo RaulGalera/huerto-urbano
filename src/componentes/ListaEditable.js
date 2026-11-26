@@ -19,7 +19,7 @@ function confirmar(mensaje, accion) {
   ]);
 }
 
-export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloNuevo, tituloEditar, campos, nuevo, items, renderTitulo, renderTexto, renderDato, avisoBorrar, filtros = [], resumen, accion }) {
+export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloNuevo, tituloEditar, campos, nuevo, items, renderTitulo, renderTexto, renderDato, avisoBorrar, filtros = [], resumen, accion, ayuda }) {
   const { guardar, borrar } = useDatos();
   const [editando, setEditando] = useState(null);
   const [busqueda, setBusqueda] = useState('');
@@ -107,6 +107,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
         <Formulario
           titulo={editando.id ? tituloEditar : tituloNuevo || textoNuevo}
           campos={campos}
+          ayuda={ayuda}
           inicial={editando}
           onCerrar={() => setEditando(null)}
           onGuardar={(v) => {

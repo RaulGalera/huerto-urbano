@@ -56,13 +56,14 @@ function Chips({ opciones, valor, onCambio }) {
 function prepararInicial(campos, inicial) {
   const v = { ...inicial };
   campos.forEach((c) => {
+    if ((v[c.clave] === undefined || v[c.clave] === null) && c.defecto !== undefined) v[c.clave] = c.defecto;
     if (c.tipo === 'fecha') v[c.clave] = verFecha(v[c.clave]);
     if (c.tipo === 'numero' && v[c.clave] !== undefined && v[c.clave] !== '') v[c.clave] = String(v[c.clave]).replace('.', ',');
   });
   return v;
 }
 
-export default function Formulario({ titulo, campos, inicial, onGuardar, onCerrar, onBorrar }) {
+export default function Formulario({ titulo, campos, inicial, onGuardar, onCerrar, onBorrar, ayuda }) {
   const [valores, setValores] = useState(() => prepararInicial(campos, inicial));
   const [error, setError] = useState('');
 
@@ -101,6 +102,16 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
     onGuardar(limpio);
   }
 
+  const consejos = (ayuda ? ayuda(valores) : []).map((a, i) => (
+    <View
+      key={i}
+      style={[estilos.fila, { gap: 10, alignItems: 'flex-start', marginTop: 14, padding: 12, borderRadius: 10, backgroundColor: a.tono === 'mal' ? colores.rojoClaro : colores.verdeClaro }]}
+    >
+      <Ionicons name={a.tono === 'mal' ? 'warning-outline' : 'happy-outline'} size={18} color={a.tono === 'mal' ? colores.rojo : colores.verde} />
+      <Text style={{ flex: 1, fontSize: 14, lineHeight: 20, color: colores.texto }}>{a.texto}</Text>
+    </View>
+  ));
+
   return (
     <Modal visible animationType="none" onRequestClose={onCerrar}>
       <ScrollView style={{ flex: 1, backgroundColor: colores.fondo }} contentContainerStyle={{ width: '100%', maxWidth: 900, alignSelf: 'center', padding: 16, paddingTop: 48 }}>
@@ -132,8 +143,10 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
                 multiline={c.tipo === 'largo'}
               />
             )}
+            {c.ayudaAqui ? consejos : null}
           </View>
         ))}
+        {campos.some((c) => c.ayudaAqui) ? null : consejos}
         {error ? <Text style={{ color: colores.rojo, marginTop: 14 }}>{error}</Text> : null}
         <Pressable style={[estilos.boton, { marginTop: 30 }]} onPress={enviar}>
           <Text style={estilos.botonTexto}>{t('Guardar')}</Text>
