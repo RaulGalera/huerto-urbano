@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import { diasDelMes, fechaLocal, leerFecha, verFecha } from '../util';
 import { idioma, t } from '../idioma';
 
@@ -34,13 +34,13 @@ function Calendario({ inicial, onElegir, onCerrar }) {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onCerrar}>
-      <Pressable style={{ flex: 1, backgroundColor: colores.sombra, justifyContent: 'center', padding: 20 }} onPress={onCerrar}>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('Cerrar')} style={{ flex: 1, backgroundColor: colores.sombra, justifyContent: 'center', padding: 20 }} onPress={onCerrar}>
         <Pressable style={{ backgroundColor: colores.superficie, borderRadius: 14, padding: 16, width: '100%', maxWidth: 380, alignSelf: 'center' }} onPress={() => {}}>
           <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 12 }]}>
             <Pressable onPress={() => mover(-1)} hitSlop={10} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel={t('Mes anterior')}>
               <Ionicons name="chevron-back" size={22} color={colores.verde} />
             </Pressable>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: colores.texto }}>
+            <Text style={{ fontSize: tam(16), fontWeight: '700', color: colores.texto }}>
               {t(MESES[mes])} {anio}
             </Text>
             <Pressable onPress={() => mover(1)} hitSlop={10} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel={t('Mes siguiente')}>
@@ -49,7 +49,7 @@ function Calendario({ inicial, onElegir, onCerrar }) {
           </View>
           <View style={{ flexDirection: 'row' }}>
             {SEMANA[idioma()].map((d, i) => (
-              <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: 12, color: colores.gris, marginBottom: 6 }}>
+              <Text key={i} style={{ flex: 1, textAlign: 'center', fontSize: tam(12), color: colores.gris, marginBottom: 6 }}>
                 {d}
               </Text>
             ))}
@@ -62,7 +62,7 @@ function Calendario({ inicial, onElegir, onCerrar }) {
                 const elegido = iso === inicial;
                 const esHoy = iso === hoy;
                 return (
-                  <Pressable key={j} onPress={() => onElegir(iso)} style={{ flex: 1, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+                  <Pressable accessibilityRole="button" accessibilityLabel={verFecha(iso)} aria-selected={elegido} key={j} onPress={() => onElegir(iso)} style={{ flex: 1, height: 40, alignItems: 'center', justifyContent: 'center' }}>
                     <View
                       style={{
                         width: 34,
@@ -83,10 +83,10 @@ function Calendario({ inicial, onElegir, onCerrar }) {
             </View>
           ))}
           <View style={[estilos.fila, { justifyContent: 'space-between', marginTop: 12 }]}>
-            <Pressable onPress={() => onElegir(hoy)} style={{ padding: 8 }}>
+            <Pressable accessibilityRole="button" onPress={() => onElegir(hoy)} style={{ padding: 8 }}>
               <Text style={{ color: colores.verde, fontWeight: '600' }}>{t('Hoy')}</Text>
             </Pressable>
-            <Pressable onPress={onCerrar} style={{ padding: 8 }}>
+            <Pressable accessibilityRole="button" onPress={onCerrar} style={{ padding: 8 }}>
               <Text style={{ color: colores.gris, fontWeight: '600' }}>{t('Cerrar')}</Text>
             </Pressable>
           </View>
@@ -101,8 +101,8 @@ export default function SelectorFecha({ valor, onCambio }) {
   const iso = leerFecha(valor || '');
   return (
     <View>
-      <Pressable style={[estilos.input, estilos.fila, { justifyContent: 'space-between' }]} onPress={() => setAbierto(true)}>
-        <Text style={{ fontSize: 15, color: valor ? colores.texto : colores.gris }}>{valor || t('Elegir fecha')}</Text>
+      <Pressable accessibilityRole="button" style={[estilos.input, estilos.fila, { justifyContent: 'space-between' }]} onPress={() => setAbierto(true)}>
+        <Text style={{ fontSize: tam(15), color: valor ? colores.texto : colores.gris }}>{valor || t('Elegir fecha')}</Text>
         <Ionicons name="calendar-outline" size={20} color={colores.verde} />
       </Pressable>
       {abierto ? (

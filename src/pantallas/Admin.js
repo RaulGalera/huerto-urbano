@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Alert, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import { useCuenta } from '../cuenta';
 import { hoy, leerDatos, useDatos, vacio } from '../datos';
 import { crearDatosEjemplo } from '../ejemplo';
@@ -25,7 +25,7 @@ function Seccion({ icono, titulo, children }) {
     <View style={estilos.tarjeta}>
       <View style={[estilos.fila, { gap: 8, marginBottom: 6 }]}>
         <Ionicons name={icono} size={20} color={colores.naranja} />
-        <Text style={estilos.tarjetaTitulo}>{titulo}</Text>
+        <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{titulo}</Text>
       </View>
       {children}
     </View>
@@ -116,7 +116,7 @@ export default function Admin() {
     <View style={{ marginTop: 6 }}>
       <View style={[estilos.fila, { gap: 8, marginBottom: 12, marginTop: 6 }]}>
         <Ionicons name="construct" size={22} color={colores.naranja} />
-        <Text style={[estilos.titulo, { marginBottom: 0, fontSize: 20 }]}>{t('Modo admin')}</Text>
+        <Text style={[estilos.titulo, { marginBottom: 0, fontSize: tam(20) }]} accessibilityRole="header">{t('Modo admin')}</Text>
       </View>
 
       {mensaje ? <Text style={{ color: mensaje.color, marginBottom: 10 }}>{mensaje.texto}</Text> : null}
@@ -145,9 +145,10 @@ export default function Admin() {
             <View key={p.cultivo} style={[estilos.fila, { gap: 8, marginTop: 6 }]}>
               <View style={{ flex: 1 }}>
                 <Text style={{ textTransform: 'capitalize', color: colores.texto }}>{p.cultivo}</Text>
-                {textoOrigen(p.cultivo, p.precio) ? <Text style={{ fontSize: 12, color: colores.gris }}>{textoOrigen(p.cultivo, p.precio)}</Text> : null}
+                {textoOrigen(p.cultivo, p.precio) ? <Text style={{ fontSize: tam(12), color: colores.gris }}>{textoOrigen(p.cultivo, p.precio)}</Text> : null}
               </View>
               <TextInput
+                accessibilityLabel={t('Precio') + ' ' + p.cultivo}
                 style={[estilos.input, { width: 90, height: 38, textAlign: 'right' }]}
                 value={p.precio}
                 keyboardType="decimal-pad"
@@ -159,22 +160,22 @@ export default function Admin() {
             </View>
           ))}
         <View style={[estilos.fila, { gap: 8, marginTop: 12 }]}>
-          <TextInput style={[estilos.input, { flex: 1, height: 38 }]} value={nuevoCultivo} onChangeText={setNuevoCultivo} placeholder={t('Nuevo cultivo')} placeholderTextColor={colores.gris} />
-          <TextInput style={[estilos.input, { width: 90, height: 38, textAlign: 'right' }]} value={nuevoPrecio} onChangeText={setNuevoPrecio} placeholder="EUR/kg" placeholderTextColor={colores.gris} keyboardType="decimal-pad" />
+          <TextInput accessibilityLabel={t('Nuevo cultivo')} style={[estilos.input, { flex: 1, height: 38 }]} value={nuevoCultivo} onChangeText={setNuevoCultivo} placeholder={t('Nuevo cultivo')} placeholderTextColor={colores.gris} />
+          <TextInput accessibilityLabel="EUR/kg" style={[estilos.input, { width: 90, height: 38, textAlign: 'right' }]} value={nuevoPrecio} onChangeText={setNuevoPrecio} placeholder="EUR/kg" placeholderTextColor={colores.gris} keyboardType="decimal-pad" />
           <Pressable hitSlop={8} onPress={anadirCultivo} accessibilityRole="button" accessibilityLabel={t('Anadir cultivo')}>
             <Ionicons name="add-circle" size={26} color={colores.verde} />
           </Pressable>
         </View>
 
         <Text style={estilos.etiqueta}>{t('Precio del agua (EUR por m3)')}</Text>
-        <TextInput style={estilos.input} value={agua} onChangeText={setAgua} keyboardType="decimal-pad" />
+        <TextInput accessibilityLabel={t('Precio del agua (EUR por m3)')} style={estilos.input} value={agua} onChangeText={setAgua} keyboardType="decimal-pad" />
         <Text style={estilos.etiqueta}>{t('Impuestos sobre el beneficio (%)')}</Text>
-        <TextInput style={estilos.input} value={impuestos} onChangeText={setImpuestos} keyboardType="decimal-pad" />
+        <TextInput accessibilityLabel={t('Impuestos sobre el beneficio (%)')} style={estilos.input} value={impuestos} onChangeText={setImpuestos} keyboardType="decimal-pad" />
 
-        <Pressable style={[estilos.boton, { marginTop: 16 }]} onPress={guardarPrecios}>
+        <Pressable accessibilityRole="button" style={[estilos.boton, { marginTop: 16 }]} onPress={guardarPrecios}>
           <Text style={estilos.botonTexto}>{t('Guardar precios')}</Text>
         </Pressable>
-        <Pressable style={{ alignItems: 'center', marginTop: 12 }} onPress={restaurar}>
+        <Pressable accessibilityRole="button" style={{ alignItems: 'center', marginTop: 12 }} onPress={restaurar}>
           <Text style={{ color: colores.gris }}>{t('Restaurar precios por defecto')}</Text>
         </Pressable>
       </Seccion>
@@ -190,14 +191,14 @@ export default function Admin() {
                 @{u.usuario} - {t(u.rol === 'admin' ? 'Admin' : 'Usuario')} - {stats ? stats.porUsuario[i] : 0} {t('parcelas')}
               </Text>
             </View>
-            <Pressable
+            <Pressable accessibilityRole="button"
               style={{ borderWidth: 1, borderColor: colores.borde, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 4 }}
               onPress={() => {
                 const error = cambiarRol(u.id, u.rol === 'admin' ? 'usuario' : 'admin');
                 avisar(t(error || 'Rol cambiado'), !!error);
               }}
             >
-              <Text style={{ fontSize: 12, color: colores.texto }}>{t(u.rol === 'admin' ? 'Quitar admin' : 'Hacer admin')}</Text>
+              <Text style={{ fontSize: tam(12), color: colores.texto }}>{t(u.rol === 'admin' ? 'Quitar admin' : 'Hacer admin')}</Text>
             </Pressable>
             {u.id !== usuario.id ? (
               <Pressable
@@ -222,7 +223,7 @@ export default function Admin() {
         <Text style={[estilos.tarjetaTexto, { marginBottom: 12 }]}>
           {t('Carga un huerto de ejemplo con temporadas, parcelas, siembras, riegos y cosechas. Viene bien para ensenar la app.')}
         </Text>
-        <Pressable
+        <Pressable accessibilityRole="button"
           style={[estilos.botonSecundario, estilos.fila, { gap: 8 }]}
           onPress={() =>
             confirmar(t('Se sustituiran tus datos por los de ejemplo. Continuar?'), () => {
@@ -234,7 +235,7 @@ export default function Admin() {
           <Ionicons name="sparkles-outline" size={18} color={colores.texto} />
           <Text style={estilos.botonSecundarioTexto}>{t('Cargar datos de ejemplo')}</Text>
         </Pressable>
-        <Pressable
+        <Pressable accessibilityRole="button"
           style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]}
           onPress={() =>
             confirmar(t('Se borraran todos tus datos. Continuar?'), () => {

@@ -69,7 +69,7 @@ export default function Login() {
           <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: colores.verdeClaro, alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="leaf" size={42} color={colores.verde} />
           </View>
-          <Text style={[estilos.titulo, { marginTop: 14, marginBottom: 4 }]}>Huerto Urbano</Text>
+          <Text style={[estilos.titulo, { marginTop: 14, marginBottom: 4 }]} accessibilityRole="header">Huerto Urbano</Text>
           <Text style={estilos.tarjetaTexto}>{t(modo === 'entrar' ? 'Inicia sesion para ver tu huerto' : 'Crea tu cuenta')}</Text>
         </View>
 
@@ -88,10 +88,10 @@ export default function Login() {
 
         {error ? <Text style={{ color: colores.rojo, marginTop: 14 }}>{t(error)}</Text> : null}
 
-        <Pressable style={[estilos.boton, { marginTop: 24 }]} onPress={enviar}>
+        <Pressable accessibilityRole="button" style={[estilos.boton, { marginTop: 24 }]} onPress={enviar}>
           <Text style={estilos.botonTexto}>{t(modo === 'entrar' ? 'Entrar' : 'Crear cuenta')}</Text>
         </Pressable>
-        <Pressable style={{ marginTop: 18, alignItems: 'center', padding: 6 }} onPress={cambiarModo}>
+        <Pressable accessibilityRole="button" style={{ marginTop: 18, alignItems: 'center', padding: 6 }} onPress={cambiarModo}>
           <Text style={{ color: colores.verde, fontWeight: '600' }}>
             {t(modo === 'entrar' ? 'No tengo cuenta, quiero registrarme' : 'Ya tengo cuenta, quiero entrar')}
           </Text>

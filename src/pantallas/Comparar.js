@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import Chips from '../componentes/Chips';
 import { comparar, resumenTemporada } from '../estadisticas';
 import { euros } from '../calculos';
@@ -24,7 +24,7 @@ function Cambio({ fila }) {
   return (
     <View style={[estilos.fila, { gap: 2, backgroundColor: fondo, borderRadius: 12, paddingHorizontal: 8, height: 24 }]}>
       {!igual ? <Ionicons name={sube ? 'arrow-up' : 'arrow-down'} size={12} color={color} /> : null}
-      <Text style={{ color, fontSize: 12, fontWeight: '700' }}>{texto}</Text>
+      <Text style={{ color, fontSize: tam(12), fontWeight: '700' }}>{texto}</Text>
     </View>
   );
 }
@@ -45,7 +45,7 @@ export default function Comparar({ datos, config, onCerrar }) {
       <ScrollView style={{ flex: 1, backgroundColor: colores.fondo }} contentContainerStyle={{ width: '100%', maxWidth: 900, alignSelf: 'center', padding: 16, paddingTop: 48, paddingBottom: 40 }}>
         <Pressable onPress={onCerrar} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Volver')} style={[estilos.fila, { marginBottom: 8, alignSelf: 'flex-start' }]}>
           <Ionicons name="chevron-back" size={18} color={colores.verde} />
-          <Text style={{ color: colores.verde, fontSize: 14 }}>{t('Volver')}</Text>
+          <Text style={{ color: colores.verde, fontSize: tam(14) }}>{t('Volver')}</Text>
         </Pressable>
         <Text style={estilos.titulo} accessibilityRole="header">
           {t('Comparar temporadas')}
@@ -61,11 +61,11 @@ export default function Comparar({ datos, config, onCerrar }) {
             {filas.map((f, i) => (
               <View key={f.clave} style={[estilos.fila, { justifyContent: 'space-between', paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: colores.borde }]}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, color: colores.gris }}>{t(f.texto)}</Text>
+                  <Text style={{ fontSize: tam(12), color: colores.gris }}>{t(f.texto)}</Text>
                   <View style={[estilos.fila, { gap: 6, marginTop: 2 }]}>
-                    <Text style={{ fontSize: 15, color: colores.gris }}>{formatear(f.tipo, f.antes)}</Text>
+                    <Text style={{ fontSize: tam(15), color: colores.gris }}>{formatear(f.tipo, f.antes)}</Text>
                     <Ionicons name="arrow-forward" size={14} color={colores.gris} />
-                    <Text style={{ fontSize: 15, color: colores.texto, fontWeight: '700' }}>{formatear(f.tipo, f.ahora)}</Text>
+                    <Text style={{ fontSize: tam(15), color: colores.texto, fontWeight: '700' }}>{formatear(f.tipo, f.ahora)}</Text>
                   </View>
                 </View>
                 <Cambio fila={f} />
@@ -82,10 +82,10 @@ export default function Comparar({ datos, config, onCerrar }) {
               [ahora, rB],
             ].map(([tem, r]) => (
               <View key={tem.id} style={[estilos.fila, { justifyContent: 'space-between', marginTop: 8 }]}>
-                <Text style={{ fontSize: 14, color: colores.gris, flex: 1 }} numberOfLines={1}>
+                <Text style={{ fontSize: tam(14), color: colores.gris, flex: 1 }} numberOfLines={1}>
                   {tem.nombre}
                 </Text>
-                <Text style={{ fontSize: 14, color: colores.texto, fontWeight: '600' }}>{r.mejor ? r.mejor.nombre + ' - ' + numero(r.mejor.valor) + ' kg' : t('Sin cosechas')}</Text>
+                <Text style={{ fontSize: tam(14), color: colores.texto, fontWeight: '600' }}>{r.mejor ? r.mejor.nombre + ' - ' + numero(r.mejor.valor) + ' kg' : t('Sin cosechas')}</Text>
               </View>
             ))}
           </View>

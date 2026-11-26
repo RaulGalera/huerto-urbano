@@ -5,12 +5,12 @@ export const paletas = {
     fondo: '#f6f7f2',
     superficie: '#ffffff',
     texto: '#1f2a1f',
-    gris: '#6b7a6b',
+    gris: '#5c6b5c',
     grisClaro: '#d9ddd2',
     borde: '#d5dccf',
     rojo: '#c62828',
     rojoClaro: '#fdecea',
-    naranja: '#ef6c00',
+    naranja: '#b85400',
     blanco: '#ffffff',
     sombra: 'rgba(0,0,0,0.35)',
   },
@@ -34,11 +34,18 @@ export const paletas = {
 export const colores = { ...paletas.claro };
 
 let temaActual = 'claro';
+let escalaActual = 1;
+
+export const ESCALAS = { normal: 1, grande: 1.2, enorme: 1.4 };
+
+export function tam(n) {
+  return Math.round(n * escalaActual);
+}
 
 function crearEstilos() {
   return {
     pantalla: { flex: 1, paddingHorizontal: 16, paddingTop: 24 },
-    titulo: { fontSize: 24, fontWeight: '700', color: colores.texto, marginBottom: 14 },
+    titulo: { fontSize: tam(24), fontWeight: '700', color: colores.texto, marginBottom: 14 },
     tarjeta: {
       backgroundColor: colores.superficie,
       borderRadius: 10,
@@ -48,8 +55,8 @@ function crearEstilos() {
       borderWidth: 1,
       borderColor: colores.borde,
     },
-    tarjetaTitulo: { fontSize: 15, fontWeight: '600', color: colores.texto },
-    tarjetaTexto: { fontSize: 12, color: colores.gris, marginTop: 6 },
+    tarjetaTitulo: { fontSize: tam(15), fontWeight: '600', color: colores.texto },
+    tarjetaTexto: { fontSize: tam(12), color: colores.gris, marginTop: 6 },
     boton: {
       backgroundColor: colores.verde,
       height: 48,
@@ -57,7 +64,7 @@ function crearEstilos() {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    botonTexto: { color: colores.blanco, fontWeight: '600', fontSize: 15 },
+    botonTexto: { color: colores.blanco, fontWeight: '600', fontSize: tam(15) },
     botonSecundario: {
       height: 48,
       borderRadius: 8,
@@ -67,16 +74,16 @@ function crearEstilos() {
       borderColor: colores.borde,
       backgroundColor: colores.superficie,
     },
-    botonSecundarioTexto: { color: colores.texto, fontWeight: '600', fontSize: 15 },
-    etiqueta: { fontSize: 13, color: colores.gris, marginBottom: 6, marginTop: 12 },
+    botonSecundarioTexto: { color: colores.texto, fontWeight: '600', fontSize: tam(15) },
+    etiqueta: { fontSize: tam(13), color: colores.gris, marginBottom: 6, marginTop: 12 },
     input: {
       backgroundColor: colores.superficie,
       borderWidth: 1,
       borderColor: colores.borde,
       borderRadius: 8,
-      height: 44,
+      minHeight: 44,
       paddingHorizontal: 12,
-      fontSize: 15,
+      fontSize: tam(15),
       color: colores.texto,
     },
     vacio: { color: colores.gris, textAlign: 'center', marginTop: 30 },
@@ -86,10 +93,12 @@ function crearEstilos() {
 
 export const estilos = crearEstilos();
 
-export function ponerTema(nombre) {
+export function ponerTema(nombre, texto) {
   const t = paletas[nombre] ? nombre : 'claro';
-  if (t === temaActual) return;
+  const e = ESCALAS[texto] || 1;
+  if (t === temaActual && e === escalaActual) return;
   temaActual = t;
+  escalaActual = e;
   Object.assign(colores, paletas[t]);
   Object.assign(estilos, crearEstilos());
 }
@@ -109,6 +118,6 @@ export function estiloChip(activo) {
       borderColor: activo ? colores.verde : colores.borde,
       backgroundColor: activo ? colores.verde : colores.superficie,
     },
-    texto: { fontSize: 13, fontWeight: activo ? '600' : '400', color: activo ? colores.blanco : colores.texto },
+    texto: { fontSize: tam(13), fontWeight: activo ? '600' : '400', color: activo ? colores.blanco : colores.texto },
   };
 }

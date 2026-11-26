@@ -57,7 +57,7 @@ Pantalla de inicio
 - Aviso de parcelas sin regar desde hace 3 dias o mas, con boton "Regar hoy".
 - Tiempo de los proximos 3 dias con Open-Meteo y consejo de riego (lluvia, calor o helada).
 - Calendario del huerto: siembras listas para cosechar, proximas cosechas y que sembrar este mes.
-- Graficas: kilos por cultivo y por mes, agua por parcela y beneficio por temporada.
+- Graficas: kilos por cultivo y por mes, agua por parcela (con litros por m2) y por mes, con el total y lo que cuesta el agua, y beneficio por temporada.
 - Beneficio de la temporada, total y por parcela, descargable en PDF.
 
 Cuentas
@@ -66,8 +66,9 @@ Cuentas
 - Guia de bienvenida de tres pasos la primera vez que se entra.
 - Idioma elegible al registrarse (espanol por defecto o ingles) y cambiable despues.
 - Modo oscuro: como el movil, claro u oscuro.
+- Tamano del texto: normal, grande o muy grande, para toda la app.
 - Avisos de riego en el movil: si una parcela lleva 3 dias o mas sin regar te llega una notificacion a las 9:00. Se activan en Mi cuenta y tienen un boton para probarlos.
-- Mi cuenta: cambiar nombre, contrasena, idioma, apariencia, avisos y ubicacion, exportar siembras, riegos y cosechas a Excel (CSV), copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
+- Mi cuenta: cambiar nombre, contrasena, idioma, apariencia, tamano del texto, avisos y ubicacion, exportar siembras, riegos y cosechas a Excel (CSV), copia de seguridad (exportar y restaurar), privacidad y borrar la cuenta.
 
 Modo admin
 
@@ -98,6 +99,7 @@ Modo admin
 | Avisos | expo-notifications (notificaciones locales) |
 | Zona segura | react-native-safe-area-context |
 | Tests | Jest con jest-expo y Testing Library |
+| Pruebas de principio a fin | Playwright (en la version web) |
 
 No usa librerias de navegacion: las pestanas y los modales estan hechos a mano para que la app sea ligera y facil de seguir.
 
@@ -127,6 +129,7 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 | `npm run ios` | Abre la app en iOS |
 | `npm run web` | Abre la app en el navegador |
 | `npm test` | Ejecuta los tests |
+| `npm run e2e` | Genera la version web y lanza las pruebas de principio a fin |
 
 ## Tests
 
@@ -134,9 +137,25 @@ La primera vez se crea un administrador: usuario `admin`, contrasena `admin123`.
 npm test
 ```
 
-GitHub Actions ejecuta los tests en cada push y en cada pull request (`.github/workflows/tests.yml`).
+GitHub Actions ejecuta los tests y las pruebas de principio a fin en cada push y en cada pull request (`.github/workflows/tests.yml`).
 
-80 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros, graficas, datos de ejemplo, rotacion y plantas amigas, lluvia como riego y exportar a CSV.
+89 tests en `__tests__/` que cubren: pantallas (bienvenida, graficas, filtros, comparar temporadas, login, registro y avisos de riego) con Testing Library, avisos de riego programados, informe PDF, calculo del beneficio, precios reales con su fuente, fechas y utilidades, calendario de cultivos, consejo de riego y prevision combinada, contrasenas con sal, SHA-256, copia de seguridad, buscador, filtros, graficas de kilos y de agua, datos de ejemplo, rotacion y plantas amigas, lluvia como riego, exportar a CSV y accesibilidad (contraste de colores, tamano del texto y botones con rol para lectores de pantalla).
+
+### Pruebas de principio a fin
+
+```bash
+npx playwright install chromium
+npm run e2e
+```
+
+Estan en `e2e/`. Abren la version web en un navegador con tamano de movil y usan la app como una persona, buscando los botones y campos por su nombre accesible:
+
+- El admin entra y ve el inicio.
+- No deja entrar con una contrasena mala.
+- Un usuario nuevo se registra, crea una parcela y la riega desde el inicio.
+- La grafica de agua por mes muestra el total, el coste y los litros por m2.
+- El texto de la app se puede agrandar.
+- La app se puede cambiar a ingles.
 
 ## Arquitectura
 
@@ -170,6 +189,7 @@ src/
   pantallas/              Resumen, Parcelas, Siembras, Riegos, Cosechas, Temporadas,
                           Comparar, Login, Perfil, Admin, Legal
 __tests__/                Tests de Jest
+e2e/                      Pruebas de principio a fin con Playwright
 docs/                     Documentacion (cumplimiento legal) y capturas
 .github/workflows/        Tests automaticos con GitHub Actions
 ```
@@ -218,7 +238,11 @@ La app esta pensada para cumplir el RGPD, la LOPDGDD, la LSSI, la Ley 11/2023 de
 - Derechos del usuario desde la app: ver, corregir, exportar y borrar sus datos.
 - El GPS solo se pide cuando el usuario pulsa el boton.
 - Sin publicidad, sin analitica y sin SDK de terceros.
-- Botones con nombre para lectores de pantalla (WCAG 2.1 AA).
+- Accesibilidad (WCAG 2.1 AA):
+  - Todos los botones tienen rol y nombre para lectores de pantalla (TalkBack, VoiceOver), las pestanas y opciones dicen cual esta elegida y los titulos se anuncian como encabezados.
+  - Todos los campos de texto tienen etiqueta.
+  - Contraste de colores de 4,5:1 o mas en el tema claro y en el oscuro, comprobado con un test.
+  - Tamano del texto ajustable en Mi cuenta, ademas de respetar el tamano de letra del movil.
 
 El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-legal.md](docs/cumplimiento-legal.md). Para publicar en Google Play falta una pagina web para pedir el borrado de la cuenta; de momento se pide por email.
 

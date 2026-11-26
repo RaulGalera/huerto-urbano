@@ -8,7 +8,7 @@ import { CuentaProvider, useCuenta } from './src/cuenta';
 import Login from './src/pantallas/Login';
 import Perfil from './src/pantallas/Perfil';
 import Bienvenida from './src/componentes/Bienvenida';
-import { colores, ponerTema } from './src/estilos';
+import { colores, ponerTema, tam } from './src/estilos';
 import Resumen from './src/pantallas/Resumen';
 import Parcelas from './src/pantallas/Parcelas';
 import Siembras from './src/pantallas/Siembras';
@@ -56,9 +56,9 @@ function Contenido({ perfil, setPerfil }) {
         {pestanas.map((p) => {
           const activo = p.clave === actual;
           return (
-            <Pressable key={p.clave} onPress={() => setActual(p.clave)} style={{ flex: 1, alignItems: 'center' }}>
+            <Pressable accessibilityRole="tab" aria-selected={activo} key={p.clave} onPress={() => setActual(p.clave)} style={{ flex: 1, alignItems: 'center' }}>
               <Ionicons name={activo ? p.icono : p.icono + '-outline'} size={22} color={activo ? colores.verde : colores.gris} />
-              <Text style={{ fontSize: 11, marginTop: 3, fontWeight: activo ? '700' : '400', color: activo ? colores.verde : colores.gris }}>{t(p.texto)}</Text>
+              <Text style={{ fontSize: tam(11), marginTop: 3, fontWeight: activo ? '700' : '400', color: activo ? colores.verde : colores.gris }}>{t(p.texto)}</Text>
             </Pressable>
           );
         })}
@@ -101,9 +101,10 @@ function Marco() {
     setPerfil(false);
   }, [id]);
   const actual = elegirTema(usuario && usuario.tema, sistema);
-  ponerTema(actual);
+  const texto = (usuario && usuario.texto) || 'normal';
+  ponerTema(actual, texto);
   return (
-    <SafeAreaView key={actual} style={{ flex: 1, backgroundColor: colores.fondo }}>
+    <SafeAreaView key={actual + texto} style={{ flex: 1, backgroundColor: colores.fondo }}>
       <View style={{ flex: 1, width: '100%', maxWidth: 900, alignSelf: 'center' }}>
         <Sesion perfil={perfil} setPerfil={setPerfil} />
       </View>

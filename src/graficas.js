@@ -35,14 +35,39 @@ export function kilosPorMes(datos, temporada) {
     .map((clave) => ({ clave, mes: Number(clave.slice(5, 7)), valor: suma[clave] }));
 }
 
+function riegosDe(datos, temporada) {
+  return datos.riegos.filter((r) => enTemporada(r.fecha, temporada));
+}
+
 export function aguaPorParcela(datos, temporada) {
+  const riegos = riegosDe(datos, temporada);
   return datos.parcelas
-    .map((p) => ({
-      nombre: p.nombre,
-      valor: datos.riegos.filter((r) => r.parcelaId === p.id && enTemporada(r.fecha, temporada)).reduce((a, r) => a + (Number(r.litros) || 0), 0),
-    }))
+    .map((p) => {
+      const valor = riegos.filter((r) => r.parcelaId === p.id).reduce((a, r) => a + (Number(r.litros) || 0), 0);
+      const metros = Number(String(p.metros || '').replace(',', '.')) || 0;
+      return { nombre: p.nombre, valor, porMetro: metros > 0 ? valor / metros : null };
+    })
     .filter((x) => x.valor > 0)
     .sort((a, b) => b.valor - a.valor);
+}
+
+export function aguaPorMes(datos, temporada) {
+  const suma = {};
+  riegosDe(datos, temporada).forEach((r) => {
+    if (!r.fecha) return;
+    const clave = r.fecha.slice(0, 7);
+    suma[clave] = (suma[clave] || 0) + (Number(r.litros) || 0);
+  });
+  return Object.keys(suma)
+    .sort()
+    .filter((clave) => suma[clave] > 0)
+    .map((clave) => ({ clave, mes: Number(clave.slice(5, 7)), valor: suma[clave] }));
+}
+
+export function resumenAgua(datos, config, temporada) {
+  const riegos = riegosDe(datos, temporada);
+  const litros = riegos.reduce((a, r) => a + (Number(r.litros) || 0), 0);
+  return { litros, riegos: riegos.length, coste: (litros / 1000) * (Number(config.precioAgua) || 0) };
 }
 
 export function beneficioPorTemporada(datos, config) {

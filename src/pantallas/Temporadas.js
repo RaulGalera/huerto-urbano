@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ListaEditable from '../componentes/ListaEditable';
 import Comparar from './Comparar';
 import { hoy, useDatos } from '../datos';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import { numero, ordenarPorFecha, verFecha } from '../util';
 import { useCuenta } from '../cuenta';
 import { calcularBeneficio, euros } from '../calculos';
@@ -36,7 +36,7 @@ export default function Temporadas() {
         style={[estilos.fila, { gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 17, borderWidth: 1, borderColor: colores.borde, backgroundColor: colores.superficie }]}
       >
         <Ionicons name="stats-chart" size={15} color={colores.verde} />
-        <Text style={{ color: colores.verde, fontSize: 13, fontWeight: '600' }}>{t('Comparar')}</Text>
+        <Text style={{ color: colores.verde, fontSize: tam(13), fontWeight: '600' }}>{t('Comparar')}</Text>
       </Pressable>
     ) : null;
 

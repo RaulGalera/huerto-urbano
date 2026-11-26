@@ -43,3 +43,7 @@ yarn-error.*
 # secretos (claves de AWS, URL privadas)
 .env
 .env.*
+
+# pruebas e2e
+test-results/
+playwright-report/

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, FlatList, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import { useDatos } from '../datos';
 import Formulario from './Formulario';
 import { filtrar } from '../copia';
@@ -45,7 +45,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
   return (
     <View style={estilos.pantalla}>
       <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 14 }]}>
-        <Text style={[estilos.titulo, { marginBottom: 0 }]}>{titulo}</Text>
+        <Text style={[estilos.titulo, { marginBottom: 0 }]} accessibilityRole="header">{titulo}</Text>
         {accion}
       </View>
       {verBarra ? (
@@ -53,7 +53,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
           <View style={[estilos.fila, estilos.input, { flex: 1, gap: 8, height: 44 }]}>
             <Ionicons name="search" size={18} color={colores.gris} />
             <TextInput
-              style={{ flex: 1, height: 40, fontSize: 15, color: colores.texto, outlineStyle: 'none' }}
+              style={{ flex: 1, height: 40, fontSize: tam(15), color: colores.texto, outlineStyle: 'none' }}
               value={busqueda}
               onChangeText={setBusqueda}
               accessibilityLabel={t('Buscar')}
@@ -84,10 +84,10 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
         renderItem={({ item }) => {
           const dato = renderDato ? renderDato(item) : null;
           return (
-            <Pressable style={estilos.tarjeta} onPress={() => setEditando(item)}>
+            <Pressable accessibilityRole="button" style={estilos.tarjeta} onPress={() => setEditando(item)}>
               <View style={[estilos.fila, { justifyContent: 'space-between', alignItems: 'flex-start' }]}>
                 <Text style={[estilos.tarjetaTitulo, { flex: 1 }]}>{renderTitulo(item)}</Text>
-                {dato ? <Text style={{ fontSize: 11, fontWeight: '600', color: dato.color, marginLeft: 8 }}>{dato.texto}</Text> : null}
+                {dato ? <Text style={{ fontSize: tam(11), fontWeight: '600', color: dato.color, marginLeft: 8 }}>{dato.texto}</Text> : null}
               </View>
               {renderTexto(item).filter(Boolean).map((linea, i) => (
                 <Text key={i} style={estilos.tarjetaTexto}>{linea}</Text>
@@ -96,7 +96,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
           );
         }}
       />
-      <Pressable style={[estilos.boton, { marginVertical: 16 }]} onPress={() => setEditando(nuevo(valores))}>
+      <Pressable accessibilityRole="button" style={[estilos.boton, { marginVertical: 16 }]} onPress={() => setEditando(nuevo(valores))}>
         <View style={[estilos.fila, { gap: 6 }]}>
           <Ionicons name="add" size={20} color={colores.blanco} />
           <Text style={estilos.botonTexto}>{textoNuevo}</Text>

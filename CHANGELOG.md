@@ -4,7 +4,15 @@ Todos los cambios importantes de la app. Las fechas van en formato AAAA-MM-DD.
 
 ## [Sin publicar]
 
+### Nuevo
+
+- Grafica de agua por mes, litros por m2 en cada parcela y total con el coste del agua.
+- Tamano del texto en Mi cuenta: normal, grande o muy grande.
+- Pruebas de principio a fin con Playwright (`npm run e2e`), tambien en GitHub Actions.
+
 ### Cambiado
+
+- Accesibilidad: rol y nombre en todos los botones, etiqueta en todos los campos, encabezados marcados y mas contraste en los colores gris y naranja del tema claro.
 
 - Precios reales: mayorista de Mercamadrid (Mercasa) y en origen del Ministerio de Agricultura, con su fuente y su fecha en la pantalla de admin. Los precios que el admin no habia tocado se actualizan solos.
 

@@ -1,4 +1,4 @@
-import { aguaPorParcela, beneficioPorTemporada, kilosPorCultivo, kilosPorMes } from '../src/graficas';
+import { aguaPorMes, aguaPorParcela, beneficioPorTemporada, kilosPorCultivo, kilosPorMes, resumenAgua } from '../src/graficas';
 
 const datos = {
   temporadas: [
@@ -6,7 +6,7 @@ const datos = {
     { id: 't1', nombre: 'Primavera', inicio: '2026-03-01', fin: '2026-06-30' },
   ],
   parcelas: [
-    { id: 'p1', nombre: 'Bancal 1', gastos: 0 },
+    { id: 'p1', nombre: 'Bancal 1', gastos: 0, metros: '4' },
     { id: 'p2', nombre: 'Macetas', gastos: 0 },
   ],
   siembras: [
@@ -42,8 +42,8 @@ test('kilos por mes en orden', () => {
 
 test('agua por parcela solo cuenta los riegos de la temporada', () => {
   expect(aguaPorParcela(datos, primavera)).toEqual([
-    { nombre: 'Bancal 1', valor: 10 },
-    { nombre: 'Macetas', valor: 3 },
+    { nombre: 'Bancal 1', valor: 10, porMetro: 2.5 },
+    { nombre: 'Macetas', valor: 3, porMetro: null },
   ]);
 });
 
@@ -52,4 +52,19 @@ test('beneficio por temporada ordenado por fecha', () => {
   expect(r.map((x) => x.nombre)).toEqual(['Primavera', 'Otono']);
   expect(r[0].valor).toBeCloseTo(9);
   expect(r[1].valor).toBeCloseTo(4);
+});
+
+test('agua por mes y litros por metro cuadrado', () => {
+  expect(aguaPorMes(datos)).toEqual([
+    { clave: '2026-04', mes: 4, valor: 13 },
+    { clave: '2026-10', mes: 10, valor: 5 },
+  ]);
+  const filas = aguaPorParcela(datos, primavera);
+  expect(filas[0]).toEqual({ nombre: 'Bancal 1', valor: 10, porMetro: 2.5 });
+  expect(filas[1].porMetro).toBeNull();
+});
+
+test('resumen del agua con su coste', () => {
+  expect(resumenAgua(datos, { precioAgua: 2 }, null)).toEqual({ litros: 18, riegos: 3, coste: 0.036 });
+  expect(resumenAgua(datos, { precioAgua: 2 }, primavera).litros).toBe(13);
 });

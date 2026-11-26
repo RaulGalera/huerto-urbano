@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estiloChip, estilos } from '../estilos';
+import { colores, estiloChip, estilos, tam } from '../estilos';
 import { hoy, useDatos } from '../datos';
 import { nombrePor, numero, ordenarPorFecha, temporadaActual } from '../util';
 import { DIAS_AVISO_RIEGO, sinRegar } from '../avisos';
@@ -17,7 +17,7 @@ import { descargarPdf, nombrePdf } from '../pdf';
 function Dato({ valor, texto }) {
   return (
     <View style={[estilos.tarjeta, { flex: 1, alignItems: 'center', paddingVertical: 12, marginBottom: 0 }]}>
-      <Text style={{ fontSize: 24, fontWeight: '700', color: colores.verde }}>{valor}</Text>
+      <Text style={{ fontSize: tam(24), fontWeight: '700', color: colores.verde }}>{valor}</Text>
       <Text style={[estilos.tarjetaTexto, { marginTop: 4 }]}>{texto}</Text>
     </View>
   );
@@ -26,8 +26,8 @@ function Dato({ valor, texto }) {
 function Linea({ texto, valor, color, negrita }) {
   return (
     <View style={[estilos.fila, { justifyContent: 'space-between', marginTop: 8 }]}>
-      <Text style={{ fontSize: 14, color: colores.texto, fontWeight: negrita ? '700' : '400' }}>{texto}</Text>
-      <Text style={{ fontSize: 14, color: color || colores.texto, fontWeight: negrita ? '700' : '600' }}>{valor}</Text>
+      <Text style={{ fontSize: tam(14), color: colores.texto, fontWeight: negrita ? '700' : '400' }}>{texto}</Text>
+      <Text style={{ fontSize: tam(14), color: color || colores.texto, fontWeight: negrita ? '700' : '600' }}>{valor}</Text>
     </View>
   );
 }
@@ -72,13 +72,13 @@ export default function Resumen({ onPerfil }) {
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 30 }}>
       <View style={[estilos.fila, { justifyContent: 'space-between', marginBottom: 12 }]}>
         <View>
-          <Text style={[estilos.titulo, { marginBottom: 0 }]}>{t('Mi huerto')}</Text>
+          <Text style={[estilos.titulo, { marginBottom: 0 }]} accessibilityRole="header">{t('Mi huerto')}</Text>
           <Text style={estilos.tarjetaTexto}>{t('Hola,')} {usuario ? usuario.nombre : ''}</Text>
         </View>
         <Pressable onPress={onPerfil} hitSlop={10} style={[estilos.fila, { gap: 4 }]} accessibilityRole="button" accessibilityLabel={t('Mi cuenta')}>
           {esAdmin ? (
             <View style={{ backgroundColor: colores.naranja, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}>
-              <Text style={{ color: colores.blanco, fontSize: 11, fontWeight: '700' }}>ADMIN</Text>
+              <Text style={{ color: colores.blanco, fontSize: tam(11), fontWeight: '700' }}>ADMIN</Text>
             </View>
           ) : null}
           <Ionicons name="person-circle-outline" size={34} color={colores.verde} />
@@ -93,7 +93,7 @@ export default function Resumen({ onPerfil }) {
           {temporadas.map((x) => {
             const e = estiloChip(x.id === elegida);
             return (
-              <Pressable key={x.id} style={e.caja} onPress={() => setElegida(x.id)}>
+              <Pressable accessibilityRole="button" aria-selected={x.id === elegida} key={x.id} style={e.caja} onPress={() => setElegida(x.id)}>
                 <Text style={e.texto}>{x.nombre}</Text>
               </Pressable>
             );
@@ -105,20 +105,20 @@ export default function Resumen({ onPerfil }) {
         <View style={{ backgroundColor: colores.rojoClaro, borderRadius: 10, padding: 14, marginTop: 18, flexDirection: 'row' }}>
           <Ionicons name="alert-circle" size={22} color={colores.rojo} style={{ marginRight: 12 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ color: colores.rojo, fontWeight: '600', fontSize: 14, marginBottom: 6 }}>
+            <Text style={{ color: colores.rojo, fontWeight: '600', fontSize: tam(14), marginBottom: 6 }}>
               {t('Parcelas sin regar')} ({DIAS_AVISO_RIEGO} {t('dias o mas')})
             </Text>
             {avisos.map((a) => (
               <View key={a.parcela.id} style={[estilos.fila, { justifyContent: 'space-between', marginTop: 6 }]}>
-                <Text style={{ color: colores.texto, fontSize: 14, flex: 1 }}>
+                <Text style={{ color: colores.texto, fontSize: tam(14), flex: 1 }}>
                   {a.parcela.nombre} - {a.dias === null ? t('nunca regada') : a.dias + ' ' + t('dias sin riego')}
                 </Text>
-                <Pressable
+                <Pressable accessibilityRole="button"
                   onPress={() => guardar('riegos', { parcelaId: a.parcela.id, fecha: hoy(), litros: '', metodo: 'Manguera' })}
                   style={[estilos.fila, { gap: 4, backgroundColor: colores.superficie, borderRadius: 14, paddingVertical: 4, paddingHorizontal: 10, borderWidth: 1, borderColor: colores.borde }]}
                 >
                   <Ionicons name="water" size={14} color={colores.verde} />
-                  <Text style={{ color: colores.verde, fontSize: 12, fontWeight: '600' }}>{t('Regar hoy')}</Text>
+                  <Text style={{ color: colores.verde, fontSize: tam(12), fontWeight: '600' }}>{t('Regar hoy')}</Text>
                 </Pressable>
               </View>
             ))}
@@ -137,13 +137,13 @@ export default function Resumen({ onPerfil }) {
       <View style={[estilos.tarjeta, { marginTop: 16 }]}>
         <View style={[estilos.fila, { gap: 8, marginBottom: 4 }]}>
           <Ionicons name="calendar-outline" size={20} color={colores.verde} />
-          <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto }}>{t('Calendario del huerto')}</Text>
+          <Text style={{ fontSize: tam(16), fontWeight: '600', color: colores.texto }}>{t('Calendario del huerto')}</Text>
         </View>
         {listas.length > 0 ? (
           listas.map((s) => (
             <View key={s.id} style={[estilos.fila, { gap: 6, marginTop: 8 }]}>
               <Ionicons name="checkmark-circle" size={18} color={colores.verde} />
-              <Text style={{ color: colores.texto, fontSize: 14 }}>
+              <Text style={{ color: colores.texto, fontSize: tam(14) }}>
                 {s.cultivo} ({nombrePor(datos.parcelas, s.parcelaId)}) {t('lista para cosechar')}
               </Text>
             </View>
@@ -154,13 +154,13 @@ export default function Resumen({ onPerfil }) {
         {proximas.map((x) => (
           <View key={x.s.id} style={[estilos.fila, { gap: 6, marginTop: 8 }]}>
             <Ionicons name="time-outline" size={18} color={colores.naranja} />
-            <Text style={{ color: colores.texto, fontSize: 14 }}>
+            <Text style={{ color: colores.texto, fontSize: tam(14) }}>
               {x.s.cultivo} {t('en')} {x.e.faltan} {t(x.e.faltan === 1 ? 'dia' : 'dias')}
             </Text>
           </View>
         ))}
         <Text style={[estilos.etiqueta, { marginTop: 14 }]}>{t('Para sembrar en')} {t(nombreMes(mes))}</Text>
-        <Text style={{ color: colores.texto, fontSize: 14, textTransform: 'capitalize' }}>{sembrarAhora.join(', ')}</Text>
+        <Text style={{ color: colores.texto, fontSize: tam(14), textTransform: 'capitalize' }}>{sembrarAhora.join(', ')}</Text>
       </View>
 
       <Graficas datos={datos} config={config} temporada={datos.temporadas.find((x) => x.id === elegida)} />
@@ -169,10 +169,10 @@ export default function Resumen({ onPerfil }) {
         <View style={[estilos.tarjeta, { paddingBottom: 18 }]}>
           <View style={[estilos.fila, { gap: 8, marginBottom: 4 }]}>
             <Ionicons name="cash-outline" size={20} color={colores.verde} />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: colores.texto, flex: 1 }}>{t('Beneficio de la temporada')}</Text>
+            <Text style={{ fontSize: tam(16), fontWeight: '600', color: colores.texto, flex: 1 }}>{t('Beneficio de la temporada')}</Text>
             <Pressable onPress={pdf} hitSlop={10} style={[estilos.fila, { gap: 4 }]} accessibilityRole="button" accessibilityLabel={t('Descargar PDF')}>
               <Ionicons name="download-outline" size={18} color={colores.verde} />
-              <Text style={{ color: colores.verde, fontSize: 13, fontWeight: '600' }}>PDF</Text>
+              <Text style={{ color: colores.verde, fontSize: tam(13), fontWeight: '600' }}>PDF</Text>
             </Pressable>
           </View>
           <Linea texto={t('Venta a precio de mercado')} valor={euros(cuentas.ingresos)} color={colores.verde} />

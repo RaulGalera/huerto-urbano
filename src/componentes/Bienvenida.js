@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import { t } from '../idioma';
 
 export const PASOS = [
@@ -22,8 +22,8 @@ export default function Bienvenida({ onFin }) {
           <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colores.verdeClaro, alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
             <Ionicons name={actual.icono} size={30} color={colores.verde} />
           </View>
-          <Text style={[estilos.tarjetaTitulo, { fontSize: 18, textAlign: 'center' }]} accessibilityRole="header">{t(actual.titulo)}</Text>
-          <Text style={[estilos.tarjetaTexto, { textAlign: 'center', fontSize: 14, lineHeight: 20, marginTop: 8 }]}>{t(actual.texto)}</Text>
+          <Text style={[estilos.tarjetaTitulo, { fontSize: tam(18), textAlign: 'center' }]} accessibilityRole="header">{t(actual.titulo)}</Text>
+          <Text style={[estilos.tarjetaTexto, { textAlign: 'center', fontSize: tam(14), lineHeight: 20, marginTop: 8 }]}>{t(actual.texto)}</Text>
           <View style={[estilos.fila, { gap: 6, marginTop: 18 }]}>
             {PASOS.map((x, i) => (
               <View key={x.titulo} style={{ width: i === paso ? 18 : 8, height: 8, borderRadius: 4, backgroundColor: i === paso ? colores.verde : colores.borde }} />

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, Modal, Platform, Pressable, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estilos } from '../estilos';
+import { colores, estilos, tam } from '../estilos';
 import { useCuenta } from '../cuenta';
 import { useDatos } from '../datos';
 import { buscarCiudad, CIUDAD_POR_DEFECTO } from '../tiempo';
@@ -17,7 +17,7 @@ import { csvCosechas, csvRiegos, csvSiembras } from '../csv';
 import { compartirTexto } from '../archivos';
 
 export default function Perfil({ onCerrar }) {
-  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarAvisos, cambiarNombre, borrarMiCuenta } = useCuenta();
+  const { usuario, esAdmin, salir, cambiarContrasena, cambiarIdioma, cambiarTema, cambiarTexto, cambiarAvisos, cambiarNombre, borrarMiCuenta } = useCuenta();
   const [nombre, setNombre] = useState(usuario.nombre);
   const [avisoNombre, setAvisoNombre] = useState(null);
   const [claveBorrar, setClaveBorrar] = useState('');
@@ -182,39 +182,39 @@ export default function Perfil({ onCerrar }) {
   return (
     <Modal visible animationType="none" onRequestClose={onCerrar}>
       <ScrollView style={{ flex: 1, backgroundColor: colores.fondo }} contentContainerStyle={{ width: '100%', maxWidth: 900, alignSelf: 'center', padding: 16, paddingTop: 48, paddingBottom: 40 }}>
-        <Pressable onPress={onCerrar} hitSlop={10} style={[estilos.fila, { marginBottom: 8, alignSelf: 'flex-start' }]}>
+        <Pressable accessibilityRole="button" onPress={onCerrar} hitSlop={10} style={[estilos.fila, { marginBottom: 8, alignSelf: 'flex-start' }]}>
           <Ionicons name="chevron-back" size={18} color={colores.verde} />
-          <Text style={{ color: colores.verde, fontSize: 14 }}>{t('Volver')}</Text>
+          <Text style={{ color: colores.verde, fontSize: tam(14) }}>{t('Volver')}</Text>
         </Pressable>
-        <Text style={estilos.titulo}>{t('Mi cuenta')}</Text>
+        <Text style={estilos.titulo} accessibilityRole="header">{t('Mi cuenta')}</Text>
 
         <View style={[estilos.tarjeta, estilos.fila, { gap: 12 }]}>
           <Ionicons name="person-circle" size={48} color={colores.verde} />
           <View style={{ flex: 1 }}>
-            <Text style={estilos.tarjetaTitulo}>{usuario.nombre}</Text>
+            <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{usuario.nombre}</Text>
             <Text style={estilos.tarjetaTexto}>@{usuario.usuario} - {t(esAdmin ? 'Administrador' : 'Usuario')}</Text>
           </View>
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Mis datos')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Mis datos')}</Text>
           <Text style={estilos.etiqueta}>{t('Nombre')}</Text>
           <TextInput style={estilos.input} value={nombre} onChangeText={setNombre} accessibilityLabel={t('Nombre')} />
           {avisoNombre ? <Text style={{ color: avisoNombre.color, marginTop: 8 }}>{avisoNombre.texto}</Text> : null}
-          <Pressable style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={guardarNombre}>
+          <Pressable accessibilityRole="button" style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={guardarNombre}>
             <Text style={estilos.botonSecundarioTexto}>{t('Guardar nombre')}</Text>
           </Pressable>
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Idioma de la app')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Idioma de la app')}</Text>
           <View style={{ marginTop: 10 }}>
             <Chips opciones={IDIOMAS} valor={usuario.idioma || 'es'} onCambiar={(i) => cambiarIdioma(usuario.id, i)} abajo={0} />
           </View>
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Apariencia')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Apariencia')}</Text>
           <View style={{ marginTop: 10 }}>
             <Chips
               opciones={[
@@ -230,7 +230,24 @@ export default function Perfil({ onCerrar }) {
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Avisos de riego')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Tamano del texto')}</Text>
+          <Text style={estilos.tarjetaTexto}>{t('Agranda las letras de toda la app.')}</Text>
+          <View style={{ marginTop: 10 }}>
+            <Chips
+              opciones={[
+                { id: 'normal', texto: t('Normal') },
+                { id: 'grande', texto: t('Grande') },
+                { id: 'enorme', texto: t('Muy grande') },
+              ]}
+              valor={usuario.texto || 'normal'}
+              onCambiar={(v) => cambiarTexto(usuario.id, v)}
+              abajo={0}
+            />
+          </View>
+        </View>
+
+        <View style={estilos.tarjeta}>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Avisos de riego')}</Text>
           <Text style={estilos.tarjetaTexto}>
             {Platform.OS === 'web'
               ? t('Los avisos solo funcionan en el movil.')
@@ -248,7 +265,7 @@ export default function Perfil({ onCerrar }) {
                 abajo={0}
               />
               {usuario.avisos ? (
-                <Pressable style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={probarRiego}>
+                <Pressable accessibilityRole="button" style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={probarRiego}>
                   <Text style={estilos.botonSecundarioTexto}>{t('Probar aviso')}</Text>
                 </Pressable>
               ) : null}
@@ -258,19 +275,19 @@ export default function Perfil({ onCerrar }) {
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Cambiar contrasena')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Cambiar contrasena')}</Text>
           <Text style={estilos.etiqueta}>{t('Contrasena actual')}</Text>
-          <TextInput style={estilos.input} value={actual} onChangeText={setActual} secureTextEntry autoCapitalize="none" />
+          <TextInput accessibilityLabel={t('Contrasena actual')} style={estilos.input} value={actual} onChangeText={setActual} secureTextEntry autoCapitalize="none" />
           <Text style={estilos.etiqueta}>{t('Contrasena nueva')}</Text>
-          <TextInput style={estilos.input} value={nueva} onChangeText={setNueva} secureTextEntry autoCapitalize="none" />
+          <TextInput accessibilityLabel={t('Contrasena nueva')} style={estilos.input} value={nueva} onChangeText={setNueva} secureTextEntry autoCapitalize="none" />
           {mensaje ? <Text style={{ color: mensaje.color, marginTop: 10 }}>{mensaje.texto}</Text> : null}
-          <Pressable style={[estilos.botonSecundario, { marginTop: 14 }]} onPress={guardarContrasena}>
+          <Pressable accessibilityRole="button" style={[estilos.botonSecundario, { marginTop: 14 }]} onPress={guardarContrasena}>
             <Text style={estilos.botonSecundarioTexto}>{t('Guardar contrasena')}</Text>
           </Pressable>
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Ubicacion del huerto')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Ubicacion del huerto')}</Text>
           <Text style={estilos.tarjetaTexto}>
             {t('Se usa para el tiempo y la lluvia. Ahora:')} {ciudad ? ciudad.nombre + (ciudad.gps ? ' (GPS)' : '') : CIUDAD_POR_DEFECTO.nombre + ' ' + t('(por defecto)')}
           </Text>
@@ -280,6 +297,7 @@ export default function Perfil({ onCerrar }) {
               value={busqueda}
               onChangeText={setBusqueda}
               onSubmitEditing={buscar}
+              accessibilityLabel={t('Ubicacion del huerto')}
               placeholder={t('Ej: Valencia')}
               placeholderTextColor={colores.gris}
             />
@@ -287,13 +305,13 @@ export default function Perfil({ onCerrar }) {
               <Ionicons name="search" size={20} color={colores.blanco} />
             </Pressable>
           </View>
-          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={usarGps}>
+          <Pressable accessibilityRole="button" style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={usarGps}>
             <Ionicons name="navigate-outline" size={18} color={colores.verde} />
             <Text style={estilos.botonSecundarioTexto}>{t('Usar mi ubicacion (GPS)')}</Text>
           </Pressable>
           {avisoCiudad ? <Text style={[estilos.tarjetaTexto, { marginTop: 8 }]}>{avisoCiudad}</Text> : null}
           {resultados.map((c) => (
-            <Pressable
+            <Pressable accessibilityRole="button"
               key={c.latitud + ',' + c.longitud}
               style={[estilos.fila, { gap: 8, paddingVertical: 10 }]}
               onPress={() => {
@@ -312,7 +330,7 @@ export default function Perfil({ onCerrar }) {
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Exportar a Excel')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Exportar a Excel')}</Text>
           <Text style={estilos.tarjetaTexto}>{t('Archivos CSV que se abren con Excel o Google Sheets.')}</Text>
           <View style={[estilos.fila, { gap: 8, marginTop: 10, flexWrap: 'wrap' }]}>
             {[
@@ -320,7 +338,7 @@ export default function Perfil({ onCerrar }) {
               ['riegos', 'Riegos'],
               ['cosechas', 'Cosechas'],
             ].map(([tipo, texto]) => (
-              <Pressable key={tipo} style={[estilos.botonSecundario, estilos.fila, { gap: 6, flexGrow: 1, justifyContent: 'center', paddingHorizontal: 12 }]} onPress={() => exportarCsv(tipo)} accessibilityLabel={t('Exportar') + ' ' + t(texto)}>
+              <Pressable accessibilityRole="button" key={tipo} style={[estilos.botonSecundario, estilos.fila, { gap: 6, flexGrow: 1, justifyContent: 'center', paddingHorizontal: 12 }]} onPress={() => exportarCsv(tipo)} accessibilityLabel={t('Exportar') + ' ' + t(texto)}>
                 <Ionicons name="document-text-outline" size={16} color={colores.verde} />
                 <Text style={estilos.botonSecundarioTexto}>{t(texto)}</Text>
               </Pressable>
@@ -330,9 +348,9 @@ export default function Perfil({ onCerrar }) {
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Copia de seguridad')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Copia de seguridad')}</Text>
           <Text style={estilos.tarjetaTexto}>{t('Guarda tus temporadas, parcelas, siembras, riegos y cosechas para no perderlas.')}</Text>
-          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={exportar}>
+          <Pressable accessibilityRole="button" style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={exportar}>
             <Ionicons name="download-outline" size={18} color={colores.verde} />
             <Text style={estilos.botonSecundarioTexto}>{t('Exportar mis datos')}</Text>
           </Pressable>
@@ -341,12 +359,13 @@ export default function Perfil({ onCerrar }) {
             style={[estilos.input, { height: 80, paddingTop: 10, textAlignVertical: 'top' }]}
             value={textoCopia}
             onChangeText={setTextoCopia}
+            accessibilityLabel={t('Para restaurar, pega aqui el texto de la copia')}
             multiline
             autoCapitalize="none"
             placeholder='{"app":"huerto-urbano", ...}'
             placeholderTextColor={colores.gris}
           />
-          <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={restaurar}>
+          <Pressable accessibilityRole="button" style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={restaurar}>
             <Ionicons name="refresh-outline" size={18} color={colores.verde} />
             <Text style={estilos.botonSecundarioTexto}>{t('Restaurar copia')}</Text>
           </Pressable>
@@ -354,7 +373,7 @@ export default function Perfil({ onCerrar }) {
         </View>
 
         <View style={estilos.tarjeta}>
-          <Text style={estilos.tarjetaTitulo}>{t('Privacidad')}</Text>
+          <Text style={estilos.tarjetaTitulo} accessibilityRole="header">{t('Privacidad')}</Text>
           <Pressable style={[estilos.botonSecundario, estilos.fila, { gap: 8, marginTop: 10 }]} onPress={() => setVerLegal(true)} accessibilityRole="button">
             <Ionicons name="shield-checkmark-outline" size={18} color={colores.verde} />
             <Text style={estilos.botonSecundarioTexto}>{t('Privacidad y aviso legal')}</Text>
@@ -371,7 +390,7 @@ export default function Perfil({ onCerrar }) {
 
         {esAdmin ? <Admin /> : null}
 
-        <Pressable style={[estilos.boton, estilos.fila, { gap: 8, backgroundColor: colores.rojo, marginTop: 10 }]} onPress={salirDeLaCuenta}>
+        <Pressable accessibilityRole="button" style={[estilos.boton, estilos.fila, { gap: 8, backgroundColor: colores.rojo, marginTop: 10 }]} onPress={salirDeLaCuenta}>
           <Ionicons name="log-out-outline" size={20} color={colores.blanco} />
           <Text style={estilos.botonTexto}>{t('Cerrar sesion')}</Text>
         </Pressable>

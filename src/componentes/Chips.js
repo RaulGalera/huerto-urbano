@@ -7,7 +7,7 @@ export default function Chips({ opciones, valor, onCambiar, abajo = 14 }) {
       {opciones.map((f) => {
         const e = estiloChip(f.id === valor);
         return (
-          <Pressable key={f.id} style={e.caja} onPress={() => onCambiar(f.id)}>
+          <Pressable accessibilityRole="button" aria-selected={f.id === valor} key={f.id} style={e.caja} onPress={() => onCambiar(f.id)}>
             <Text style={e.texto}>{f.texto}</Text>
           </Pressable>
         );

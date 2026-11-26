@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colores, estiloChip, estilos } from '../estilos';
+import { colores, estiloChip, estilos, tam } from '../estilos';
 import { leerFecha, verFecha } from '../util';
 import SelectorFecha from './SelectorFecha';
 import { t } from '../idioma';
@@ -14,14 +14,14 @@ function Desplegable({ opciones, valor, onCambio }) {
   }
   return (
     <View>
-      <Pressable style={[estilos.input, estilos.fila, { justifyContent: 'space-between' }]} onPress={() => setAbierto(!abierto)}>
-        <Text style={{ fontSize: 15, color: elegida ? colores.texto : colores.gris }}>{elegida ? elegida.texto : t('Elegir')}</Text>
+      <Pressable accessibilityRole="button" style={[estilos.input, estilos.fila, { justifyContent: 'space-between' }]} onPress={() => setAbierto(!abierto)}>
+        <Text style={{ fontSize: tam(15), color: elegida ? colores.texto : colores.gris }}>{elegida ? elegida.texto : t('Elegir')}</Text>
         <Ionicons name={abierto ? 'chevron-up' : 'chevron-down'} size={18} color={colores.gris} />
       </Pressable>
       {abierto ? (
         <View style={{ backgroundColor: colores.superficie, borderWidth: 1, borderColor: colores.borde, borderRadius: 8, marginTop: 4 }}>
           {opciones.map((o) => (
-            <Pressable
+            <Pressable accessibilityRole="button"
               key={o.valor}
               onPress={() => {
                 onCambio(o.valor);
@@ -44,7 +44,7 @@ function Chips({ opciones, valor, onCambio }) {
       {opciones.map((o) => {
         const e = estiloChip(o.valor === valor);
         return (
-          <Pressable key={o.valor} style={e.caja} onPress={() => onCambio(o.valor)}>
+          <Pressable accessibilityRole="button" aria-selected={o.valor === valor} key={o.valor} style={e.caja} onPress={() => onCambio(o.valor)}>
             <Text style={e.texto}>{o.texto}</Text>
           </Pressable>
         );
@@ -108,18 +108,18 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
       style={[estilos.fila, { gap: 10, alignItems: 'flex-start', marginTop: 14, padding: 12, borderRadius: 10, backgroundColor: a.tono === 'mal' ? colores.rojoClaro : colores.verdeClaro }]}
     >
       <Ionicons name={a.tono === 'mal' ? 'warning-outline' : 'happy-outline'} size={18} color={a.tono === 'mal' ? colores.rojo : colores.verde} />
-      <Text style={{ flex: 1, fontSize: 14, lineHeight: 20, color: colores.texto }}>{a.texto}</Text>
+      <Text style={{ flex: 1, fontSize: tam(14), lineHeight: 20, color: colores.texto }}>{a.texto}</Text>
     </View>
   ));
 
   return (
     <Modal visible animationType="none" onRequestClose={onCerrar}>
       <ScrollView style={{ flex: 1, backgroundColor: colores.fondo }} contentContainerStyle={{ width: '100%', maxWidth: 900, alignSelf: 'center', padding: 16, paddingTop: 48 }}>
-        <Pressable onPress={onCerrar} hitSlop={10} style={[estilos.fila, { marginBottom: 8, alignSelf: 'flex-start' }]}>
+        <Pressable accessibilityRole="button" onPress={onCerrar} hitSlop={10} style={[estilos.fila, { marginBottom: 8, alignSelf: 'flex-start' }]}>
           <Ionicons name="chevron-back" size={18} color={colores.verde} />
-          <Text style={{ color: colores.verde, fontSize: 14 }}>{t('Volver')}</Text>
+          <Text style={{ color: colores.verde, fontSize: tam(14) }}>{t('Volver')}</Text>
         </Pressable>
-        <Text style={[estilos.titulo, { marginBottom: 4 }]}>{titulo}</Text>
+        <Text style={[estilos.titulo, { marginBottom: 4 }]} accessibilityRole="header">{titulo}</Text>
         {campos.map((c) => (
           <View key={c.clave}>
             <Text style={estilos.etiqueta}>
@@ -134,6 +134,7 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
               <Chips opciones={c.opciones} valor={valores[c.clave]} onCambio={(v) => cambiar(c.clave, v)} />
             ) : (
               <TextInput
+                accessibilityLabel={c.etiqueta}
                 style={[estilos.input, c.tipo === 'largo' ? { height: 96, paddingTop: 12, textAlignVertical: 'top' } : null]}
                 value={valores[c.clave] === undefined || valores[c.clave] === null ? '' : String(valores[c.clave])}
                 onChangeText={(v) => cambiar(c.clave, v)}
@@ -148,14 +149,14 @@ export default function Formulario({ titulo, campos, inicial, onGuardar, onCerra
         ))}
         {campos.some((c) => c.ayudaAqui) ? null : consejos}
         {error ? <Text style={{ color: colores.rojo, marginTop: 14 }}>{error}</Text> : null}
-        <Pressable style={[estilos.boton, { marginTop: 30 }]} onPress={enviar}>
+        <Pressable accessibilityRole="button" style={[estilos.boton, { marginTop: 30 }]} onPress={enviar}>
           <Text style={estilos.botonTexto}>{t('Guardar')}</Text>
         </Pressable>
-        <Pressable style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={onCerrar}>
+        <Pressable accessibilityRole="button" style={[estilos.botonSecundario, { marginTop: 12 }]} onPress={onCerrar}>
           <Text style={estilos.botonSecundarioTexto}>{t('Cancelar')}</Text>
         </Pressable>
         {onBorrar ? (
-          <Pressable style={[estilos.fila, { marginTop: 20, justifyContent: 'center', padding: 8, gap: 6 }]} onPress={onBorrar}>
+          <Pressable accessibilityRole="button" style={[estilos.fila, { marginTop: 20, justifyContent: 'center', padding: 8, gap: 6 }]} onPress={onBorrar}>
             <Ionicons name="trash-outline" size={18} color={colores.rojo} />
             <Text style={{ color: colores.rojo, fontWeight: '600' }}>{t('Borrar')}</Text>
           </Pressable>
