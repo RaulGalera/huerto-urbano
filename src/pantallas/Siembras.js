@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import ListaEditable from '../componentes/ListaEditable';
 import { hoy, useDatos } from '../datos';
-import Chips from '../componentes/Chips';
 import { claveCultivo, cultivosDe, nombrePor, numero, ordenarPorFecha, temporadaActual, verFecha } from '../util';
 import { estadoSiembra } from '../cultivos';
 import { colores } from '../estilos';
@@ -10,10 +8,7 @@ import { t } from '../idioma';
 export default function Siembras() {
   const { datos } = useDatos();
   const actual = temporadaActual(datos.temporadas, hoy());
-  const [filtroGuardado, setFiltro] = useState(null);
-  const filtro = filtroGuardado === 'todas' || datos.temporadas.some((x) => x.id === filtroGuardado) ? filtroGuardado : actual ? actual.id : 'todas';
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
-  const [verdura, setVerdura] = useState('todas');
 
   const campos = [
     { clave: 'cultivo', etiqueta: t('Cultivo'), tipo: 'texto', obligatorio: true, ejemplo: t('Ej: Tomate') },
@@ -24,11 +19,11 @@ export default function Siembras() {
     { clave: 'notas', etiqueta: t('Notas'), tipo: 'largo' },
   ];
 
-  const filtros = [...temporadas.map((x) => ({ id: x.id, texto: x.nombre })), { id: 'todas', texto: t('Todas') }];
-  const deTemporada = filtro === 'todas' ? datos.siembras : datos.siembras.filter((s) => s.temporadaId === filtro);
-  const verduras = cultivosDe(deTemporada);
-  const verduraActiva = verduras.some((v) => v.id === verdura) ? verdura : 'todas';
-  const items = ordenarPorFecha(verduraActiva === 'todas' ? deTemporada : deTemporada.filter((s) => claveCultivo(s.cultivo) === verduraActiva));
+  const filtros = [
+    { clave: 'temporada', titulo: t('Temporada'), opciones: temporadas.map((x) => ({ id: x.id, texto: x.nombre })), defecto: actual ? actual.id : 'todas', aplica: (s, id) => s.temporadaId === id },
+    { clave: 'parcela', titulo: t('Parcela'), opciones: datos.parcelas.map((p) => ({ id: p.id, texto: p.nombre })), aplica: (s, id) => s.parcelaId === id },
+    { clave: 'verdura', titulo: t('Verdura'), opciones: cultivosDe(datos.siembras), aplica: (s, id) => claveCultivo(s.cultivo) === id },
+  ];
 
   function estimacion(s) {
     const e = estadoSiembra(s, datos.cosechas, hoy());
@@ -50,13 +45,6 @@ export default function Siembras() {
     return lista.length + ' ' + t(lista.length === 1 ? 'cosecha' : 'cosechas') + ' - ' + numero(kilos) + ' kg';
   }
 
-  const cabecera = (
-    <>
-      <Chips opciones={filtros} valor={filtro} onCambiar={setFiltro} abajo={verduras.length > 1 ? 8 : 14} />
-      {verduras.length > 1 ? <Chips opciones={[{ id: 'todas', texto: t('Todas las verduras') }, ...verduras]} valor={verduraActiva} onCambiar={setVerdura} /> : null}
-    </>
-  );
-
   return (
     <ListaEditable
       tipo="siembras"
@@ -65,16 +53,17 @@ export default function Siembras() {
       textoNuevo={t('Nueva siembra')}
       tituloEditar={t('Editar siembra')}
       campos={campos}
-      cabecera={cabecera}
-      nuevo={() => ({
+      filtros={filtros}
+      resumen={(lista) => lista.length + ' ' + t(lista.length === 1 ? 'siembra' : 'siembras')}
+      nuevo={(f) => ({
         cultivo: '',
-        parcelaId: datos.parcelas.length === 1 ? datos.parcelas[0].id : undefined,
-        temporadaId: filtro !== 'todas' ? filtro : actual ? actual.id : undefined,
+        parcelaId: f.parcela !== 'todas' ? f.parcela : datos.parcelas.length === 1 ? datos.parcelas[0].id : undefined,
+        temporadaId: f.temporada !== 'todas' ? f.temporada : actual ? actual.id : undefined,
         fecha: hoy(),
         cantidad: '',
         notas: '',
       })}
-      items={items}
+      items={ordenarPorFecha(datos.siembras)}
       renderTitulo={(s) => s.cultivo}
       renderTexto={(s) => [
         [nombrePor(datos.parcelas, s.parcelaId), verFecha(s.fecha), s.cantidad ? s.cantidad + ' ' + t('plantas') : ''].filter(Boolean).join(' - '),

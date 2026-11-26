@@ -5,6 +5,7 @@ import { colores, estilos } from '../estilos';
 import { useDatos } from '../datos';
 import Formulario from './Formulario';
 import { filtrar } from '../copia';
+import PanelFiltros, { aplicarFiltros, BotonFiltros, Pastillas, valoresFiltros } from './Filtros';
 import { t } from '../idioma';
 
 function confirmar(mensaje, accion) {
@@ -18,34 +19,55 @@ function confirmar(mensaje, accion) {
   ]);
 }
 
-export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloNuevo, tituloEditar, campos, nuevo, items, renderTitulo, renderTexto, renderDato, avisoBorrar, cabecera }) {
+export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloNuevo, tituloEditar, campos, nuevo, items, renderTitulo, renderTexto, renderDato, avisoBorrar, filtros = [], resumen }) {
   const { guardar, borrar } = useDatos();
   const [editando, setEditando] = useState(null);
   const [busqueda, setBusqueda] = useState('');
-  const visibles = filtrar(items, busqueda, (x) => [renderTitulo(x), ...renderTexto(x)].filter(Boolean).join(' '));
+  const [elegidos, setElegidos] = useState({});
+  const [panel, setPanel] = useState(false);
+  const usables = filtros.filter((f) => f.opciones.length > 1);
+  const valores = valoresFiltros(filtros, elegidos);
+  const activos = usables.filter((f) => valores[f.clave] !== 'todas').length;
+  const filtrados = aplicarFiltros(items, usables, valores);
+  const visibles = filtrar(filtrados, busqueda, (x) => [renderTitulo(x), ...renderTexto(x)].filter(Boolean).join(' '));
+  const verBarra = items.length > 3 || usables.length > 0;
+
+  function cambiar(clave, id) {
+    setElegidos({ ...elegidos, [clave]: id });
+  }
+
+  function limpiar() {
+    const vacios = {};
+    usables.forEach((f) => (vacios[f.clave] = 'todas'));
+    setElegidos(vacios);
+  }
 
   return (
     <View style={estilos.pantalla}>
       <Text style={estilos.titulo}>{titulo}</Text>
-      {cabecera}
-      {items.length > 3 ? (
-        <View style={[estilos.fila, estilos.input, { gap: 8, marginBottom: 12 }]}>
-          <Ionicons name="search" size={18} color={colores.gris} />
-          <TextInput
-            style={{ flex: 1, height: 42, fontSize: 15, color: colores.texto, outlineStyle: 'none' }}
-            value={busqueda}
-            onChangeText={setBusqueda}
-            accessibilityLabel={t('Buscar')}
-            placeholder={t('Buscar')}
-            placeholderTextColor={colores.gris}
-          />
-          {busqueda ? (
-            <Pressable onPress={() => setBusqueda('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Borrar busqueda')}>
-              <Ionicons name="close-circle" size={18} color={colores.gris} />
-            </Pressable>
-          ) : null}
+      {verBarra ? (
+        <View style={[estilos.fila, { gap: 8, marginBottom: 10 }]}>
+          <View style={[estilos.fila, estilos.input, { flex: 1, gap: 8, height: 44 }]}>
+            <Ionicons name="search" size={18} color={colores.gris} />
+            <TextInput
+              style={{ flex: 1, height: 40, fontSize: 15, color: colores.texto, outlineStyle: 'none' }}
+              value={busqueda}
+              onChangeText={setBusqueda}
+              accessibilityLabel={t('Buscar')}
+              placeholder={t('Buscar')}
+              placeholderTextColor={colores.gris}
+            />
+            {busqueda ? (
+              <Pressable onPress={() => setBusqueda('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Borrar busqueda')}>
+                <Ionicons name="close-circle" size={18} color={colores.gris} />
+              </Pressable>
+            ) : null}
+          </View>
+          {usables.length ? <BotonFiltros cuantos={activos} onPress={() => setPanel(true)} /> : null}
         </View>
       ) : null}
+      <Pastillas filtros={usables} valores={valores} onQuitar={(clave) => cambiar(clave, 'todas')} />
+      {resumen && visibles.length ? <Text style={[estilos.tarjetaTexto, { marginTop: 0, marginBottom: 10 }]}>{resumen(visibles)}</Text> : null}
       <FlatList
         data={visibles}
         keyExtractor={(x) => x.id}
@@ -53,7 +75,7 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
         ListEmptyComponent={
           <View style={{ alignItems: 'center', marginTop: 40 }}>
             <Ionicons name={(icono || 'leaf') + '-outline'} size={48} color={colores.borde} />
-            <Text style={[estilos.vacio, { marginTop: 10 }]}>{t(items.length ? 'No hay resultados para esa busqueda.' : 'Todavia no hay nada. Pulsa el boton de abajo.')}</Text>
+            <Text style={[estilos.vacio, { marginTop: 10 }]}>{t(items.length ? 'No hay resultados con estos filtros.' : 'Todavia no hay nada. Pulsa el boton de abajo.')}</Text>
           </View>
         }
         renderItem={({ item }) => {
@@ -71,12 +93,13 @@ export default function ListaEditable({ tipo, titulo, icono, textoNuevo, tituloN
           );
         }}
       />
-      <Pressable style={[estilos.boton, { marginVertical: 16 }]} onPress={() => setEditando(nuevo())}>
+      <Pressable style={[estilos.boton, { marginVertical: 16 }]} onPress={() => setEditando(nuevo(valores))}>
         <View style={[estilos.fila, { gap: 6 }]}>
           <Ionicons name="add" size={20} color={colores.blanco} />
           <Text style={estilos.botonTexto}>{textoNuevo}</Text>
         </View>
       </Pressable>
+      {panel ? <PanelFiltros filtros={usables} valores={valores} total={visibles.length} onCambiar={cambiar} onLimpiar={limpiar} onCerrar={() => setPanel(false)} /> : null}
       {editando ? (
         <Formulario
           titulo={editando.id ? tituloEditar : tituloNuevo || textoNuevo}

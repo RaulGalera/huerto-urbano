@@ -4,6 +4,7 @@ import Bienvenida from '../src/componentes/Bienvenida';
 import Graficas from '../src/componentes/Graficas';
 import Chips from '../src/componentes/Chips';
 import Casilla from '../src/componentes/Casilla';
+import PanelFiltros, { Pastillas } from '../src/componentes/Filtros';
 import Login from '../src/pantallas/Login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CuentaProvider, useCuenta } from '../src/cuenta';
@@ -74,6 +75,30 @@ test('Casilla cambia de estado', async () => {
   expect(casilla.props.accessibilityState.checked).toBe(false);
   await fireEvent.press(casilla);
   expect(onCambiar).toHaveBeenCalledWith(true);
+});
+
+describe('Filtros', () => {
+  const filtros = [{ clave: 'parcela', titulo: 'Parcela', opciones: [{ id: 'p1', texto: 'Bancal 1' }, { id: 'p2', texto: 'Bancal 2' }] }];
+
+  test('el panel cambia, limpia y cierra', async () => {
+    const onCambiar = jest.fn();
+    const onLimpiar = jest.fn();
+    const onCerrar = jest.fn();
+    await render(<PanelFiltros filtros={filtros} valores={{ parcela: 'todas' }} total={3} onCambiar={onCambiar} onLimpiar={onLimpiar} onCerrar={onCerrar} />);
+    await fireEvent.press(screen.getByText('Bancal 2'));
+    expect(onCambiar).toHaveBeenCalledWith('parcela', 'p2');
+    await fireEvent.press(screen.getByText('Limpiar'));
+    expect(onLimpiar).toHaveBeenCalled();
+    await fireEvent.press(screen.getByText('Ver 3 resultados'));
+    expect(onCerrar).toHaveBeenCalled();
+  });
+
+  test('las pastillas muestran los filtros activos y se pueden quitar', async () => {
+    const onQuitar = jest.fn();
+    await render(<Pastillas filtros={filtros} valores={{ parcela: 'p1' }} onQuitar={onQuitar} />);
+    await fireEvent.press(screen.getByText('Bancal 1'));
+    expect(onQuitar).toHaveBeenCalledWith('parcela');
+  });
 });
 
 describe('Login', () => {
