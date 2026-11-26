@@ -11,7 +11,7 @@ import Graficas from '../componentes/Graficas';
 import { estadoSiembra, nombreMes, paraSembrar } from '../cultivos';
 import { t } from '../idioma';
 import { htmlBalance } from '../informe';
-import { compartirPdf } from '../pdf';
+import { descargarPdf, nombrePdf } from '../pdf';
 
 const DIAS_AVISO_RIEGO = 3;
 
@@ -60,9 +60,11 @@ export default function Resumen({ onPerfil }) {
   async function pdf() {
     const temporada = datos.temporadas.find((x) => x.id === elegida);
     try {
-      await compartirPdf(htmlBalance(datos, config, temporada, usuario ? usuario.nombre : '', hoy()), t('Balance') + ' ' + temporada.nombre);
+      const html = htmlBalance(datos, config, temporada, usuario ? usuario.nombre : '', hoy());
+      const resultado = await descargarPdf(html, nombrePdf(t('Balance') + ' ' + temporada.nombre, hoy()));
+      if (resultado === 'guardado') Alert.alert(t('PDF guardado'), t('Lo tienes en la carpeta que elegiste.'));
     } catch (e) {
-      Alert.alert(t('No se pudo crear el PDF'));
+      Alert.alert(t('No se pudo crear el PDF'), String((e && e.message) || e));
     }
   }
 

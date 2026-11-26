@@ -24,3 +24,13 @@ test('el informe tiene el balance, las parcelas y los kilos', () => {
   expect(html).toContain('28,00 EUR');
   expect(html).not.toContain('<2026>');
 });
+
+test('el nombre del PDF no lleva acentos ni espacios', () => {
+  jest.resetModules();
+  jest.doMock('expo-print', () => ({}));
+  jest.doMock('expo-sharing', () => ({}));
+  jest.doMock('expo-file-system', () => ({ Directory: class {}, File: class {}, Paths: {} }));
+  jest.doMock('@react-native-async-storage/async-storage', () => ({}));
+  const { nombrePdf } = require('../src/pdf');
+  expect(nombrePdf('Balance Temporada oto\u00f1o', '2026-11-26')).toBe('balance-temporada-otono-2026-11-26.pdf');
+});

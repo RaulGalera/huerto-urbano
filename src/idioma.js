@@ -309,6 +309,8 @@ const textos = {
     'Mira el inicio': 'Check the home screen',
     'Ahi tienes los avisos de riego, el tiempo, las graficas y el beneficio de la temporada.': 'There you have watering alerts, the weather, charts and the season profit.',
     Saltar: 'Skip',
+    'PDF guardado': 'PDF saved',
+    'Lo tienes en la carpeta que elegiste.': 'You will find it in the folder you chose.',
     Filtros: 'Filters',
     Limpiar: 'Clear',
     Ver: 'Show',
