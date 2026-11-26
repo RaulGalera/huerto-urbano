@@ -1,7 +1,7 @@
 export const VERSION_LEGAL = '2026-11-25';
 
 export const RESPONSABLE = {
-  nombre: 'Raul Galera',
+  nombre: 'Huerto Urbano',
   email: 'raulgalera67@gmail.com',
 };
 
@@ -24,7 +24,7 @@ const es = [
   {
     titulo: 'Aviso legal',
     parrafos: [
-      'Huerto Urbano es un proyecto de 2 DAM de ' + RESPONSABLE.nombre + '. Contacto: ' + RESPONSABLE.email + '.',
+      'Huerto Urbano es un proyecto de 2 DAM. Contacto: ' + RESPONSABLE.email + '.',
       'La app es gratuita y no vende nada. Cumple la Ley 34/2002 de servicios de la sociedad de la informacion (LSSI), el RGPD y la Ley Organica 3/2018 (LOPDGDD).',
     ],
   },
@@ -64,7 +64,7 @@ const en = [
   {
     titulo: 'Legal notice',
     parrafos: [
-      'Huerto Urbano is a 2 DAM project by ' + RESPONSABLE.nombre + '. Contact: ' + RESPONSABLE.email + '.',
+      'Huerto Urbano is a 2 DAM project. Contact: ' + RESPONSABLE.email + '.',
       'The app is free and sells nothing. It follows the Spanish LSSI (Law 34/2002), the GDPR and the LOPDGDD (Organic Law 3/2018).',
     ],
   },

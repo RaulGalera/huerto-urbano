@@ -14,7 +14,7 @@ test('escapar quita los caracteres peligrosos', () => {
 });
 
 test('el informe tiene el balance, las parcelas y los kilos', () => {
-  const html = htmlBalance(datos, config, datos.temporadas[0], 'Raul', '2026-11-25');
+  const html = htmlBalance(datos, config, datos.temporadas[0], 'Ana', '2026-11-25');
   expect(html).toContain('Primavera &lt;2026&gt;');
   expect(html).toContain('01/03/2026 - 30/06/2026');
   expect(html).toContain('25/11/2026');

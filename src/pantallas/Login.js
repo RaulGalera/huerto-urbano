@@ -73,8 +73,8 @@ export default function Login() {
           <Text style={estilos.tarjetaTexto}>{t(modo === 'entrar' ? 'Inicia sesion para ver tu huerto' : 'Crea tu cuenta')}</Text>
         </View>
 
-        {modo === 'registro' ? <Campo etiqueta={t('Nombre')} valor={nombre} onCambio={setNombre} ejemplo={t('Ej: Raul')} /> : null}
-        <Campo etiqueta={t('Usuario')} valor={usuario} onCambio={setUsuario} ejemplo={t('Ej: raul')} />
+        {modo === 'registro' ? <Campo etiqueta={t('Nombre')} valor={nombre} onCambio={setNombre} ejemplo={t('Ej: Ana')} /> : null}
+        <Campo etiqueta={t('Usuario')} valor={usuario} onCambio={setUsuario} ejemplo={t('Ej: ana')} />
         <Campo etiqueta={t('Contrasena')} valor={contrasena} onCambio={setContrasena} secreto />
         {modo === 'registro' ? <Campo etiqueta={t('Repetir contrasena')} valor={repetir} onCambio={setRepetir} secreto /> : null}
         {modo === 'registro' ? (

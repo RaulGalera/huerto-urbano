@@ -209,7 +209,3 @@ El detalle y lo que tiene que cumplir el servidor esta en [docs/cumplimiento-leg
 - Codigo en espanol, sin comentarios, sin acentos ni caracteres especiales en codigo y textos de la app.
 - Un commit por cada mejora, con mensaje corto en espanol.
 - Antes de subir: `npm test` tiene que pasar entero.
-
-## Autor
-
-Raul Galera, 2 DAM.
