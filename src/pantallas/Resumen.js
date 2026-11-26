@@ -33,7 +33,7 @@ function Linea({ texto, valor, color, negrita }) {
 }
 
 export default function Resumen({ onPerfil }) {
-  const { datos, guardar, guardarAjustes } = useDatos();
+  const { datos, guardar, guardarAjustes, guardarLluvias } = useDatos();
   const guardarUbicacion = useCallback((ciudad) => guardarAjustes({ ciudad }), [guardarAjustes]);
   const { usuario, config, esAdmin } = useCuenta();
   const temporadas = ordenarPorFecha(datos.temporadas, 'inicio');
@@ -126,7 +126,7 @@ export default function Resumen({ onPerfil }) {
         </View>
       ) : null}
 
-      <Tiempo ciudad={datos.ajustes && datos.ajustes.ciudad} onUbicacion={guardarUbicacion} />
+      <Tiempo ciudad={datos.ajustes && datos.ajustes.ciudad} onUbicacion={guardarUbicacion} onLluvias={guardarLluvias} />
 
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 16 }}>
         <Dato valor={datos.parcelas.length} texto={t('Parcelas')} />

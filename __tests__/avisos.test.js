@@ -11,7 +11,7 @@ jest.mock('expo-notifications', () => ({
 }));
 
 import * as N from 'expo-notifications';
-import { planAvisos, programarAvisos, sinRegar, textoAviso } from '../src/avisos';
+import { planAvisos, programarAvisos, sinRegar, textoAviso, ultimaAgua } from '../src/avisos';
 import { fechaLocal } from '../src/util';
 
 const datos = {
@@ -76,4 +76,18 @@ test('programarAvisos desactivado solo cancela', async () => {
   expect(total).toBe(0);
   expect(N.cancelScheduledNotificationAsync).toHaveBeenCalledWith('riego-viejo');
   expect(N.scheduleNotificationAsync).not.toHaveBeenCalled();
+});
+
+test('la lluvia cuenta como riego solo en parcelas al aire libre', () => {
+  const conLluvia = {
+    parcelas: [
+      { id: 'a', nombre: 'Bancal 1' },
+      { id: 'b', nombre: 'Invernadero', aireLibre: 'no' },
+    ],
+    riegos: [{ id: 'r1', parcelaId: 'b', fecha: '2026-11-20' }],
+    ajustes: { lluvias: { '2026-11-24': 8, '2026-11-25': 2 } },
+  };
+  expect(ultimaAgua(conLluvia, conLluvia.parcelas[0], '2026-11-26')).toEqual({ fecha: '2026-11-24', lluvia: true, mm: 8, dias: 2 });
+  expect(ultimaAgua(conLluvia, conLluvia.parcelas[1], '2026-11-26')).toEqual({ fecha: '2026-11-20', lluvia: false, dias: 6 });
+  expect(sinRegar(conLluvia, '2026-11-26').map((a) => a.parcela.id)).toEqual(['b']);
 });

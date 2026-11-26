@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colores, estilos } from '../estilos';
-import { CIUDAD_POR_DEFECTO, consejoRiego, describirCodigo, obtenerTiempo } from '../tiempo';
+import { CIUDAD_POR_DEFECTO, consejoRiego, describirCodigo, lluviaReciente, obtenerTiempo } from '../tiempo';
+import { numero, verFecha } from '../util';
 import { ubicacionActual } from '../ubicacion';
 import { t } from '../idioma';
 
@@ -23,7 +24,7 @@ function redondear(n) {
   return Math.round(n);
 }
 
-export default function Tiempo({ ciudad, onUbicacion }) {
+export default function Tiempo({ ciudad, onUbicacion, onLluvias }) {
   const lugar = ciudad || CIUDAD_POR_DEFECTO;
   const [estado, setEstado] = useState({ cargando: true });
   const [avisoGps, setAvisoGps] = useState('');
@@ -42,7 +43,10 @@ export default function Tiempo({ ciudad, onUbicacion }) {
   const cargar = useCallback(() => {
     setEstado({ cargando: true });
     obtenerTiempo(lugar.latitud, lugar.longitud)
-      .then((r) => setEstado({ tiempo: r }))
+      .then((r) => {
+        setEstado({ tiempo: r });
+        if (onLluvias) onLluvias(r.lluvias);
+      })
       .catch(() => setEstado({ error: true }));
   }, [lugar.latitud, lugar.longitud]);
 
@@ -51,6 +55,7 @@ export default function Tiempo({ ciudad, onUbicacion }) {
   }, [cargar]);
 
   const consejo = estado.tiempo ? consejoRiego(estado.tiempo.dias) : null;
+  const lluvia = estado.tiempo ? lluviaReciente(estado.tiempo.lluvias) : null;
   const colorConsejo = consejo && consejo.tipo === 'lluvia' ? colores.verde : consejo && consejo.tipo !== 'normal' ? colores.naranja : colores.gris;
 
   return (
@@ -112,6 +117,14 @@ export default function Tiempo({ ciudad, onUbicacion }) {
             <Ionicons name={consejo.tipo === 'lluvia' ? 'umbrella-outline' : 'information-circle-outline'} size={18} color={colorConsejo} />
             <Text style={{ flex: 1, fontSize: 14, color: colores.texto }}>{textoConsejo(consejo)}</Text>
           </View>
+          {lluvia ? (
+            <View style={[estilos.fila, { gap: 6, marginTop: 8 }]}>
+              <Ionicons name="water-outline" size={18} color={colores.verde} />
+              <Text style={{ flex: 1, fontSize: 14, color: colores.texto }}>
+                {t('El')} {verFecha(lluvia.fecha)} {t('cayeron')} {numero(lluvia.mm, 1)} mm. {t('Cuenta como riego en las parcelas al aire libre.')}
+              </Text>
+            </View>
+          ) : null}
           <Text style={[estilos.tarjetaTexto, { fontSize: 11, marginTop: 10 }]}>{t('Datos:')} {estado.tiempo.modelo} {t('via')} Open-Meteo</Text>
         </>
       ) : null}

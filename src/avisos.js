@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import { fechaLocal, ordenarPorFecha } from './util';
+import { LLUVIA_COMO_RIEGO } from './tiempo';
 import { t } from './idioma';
 
 export const DIAS_AVISO_RIEGO = 3;
@@ -12,11 +13,27 @@ function diasEntre(desde, hasta) {
   return Math.round((new Date(hasta + 'T00:00:00') - new Date(desde + 'T00:00:00')) / 86400000);
 }
 
+export function leCaeLaLluvia(parcela) {
+  return parcela.aireLibre !== 'no';
+}
+
+export function ultimaAgua(datos, parcela, fecha) {
+  const r = ordenarPorFecha(datos.riegos.filter((x) => x.parcelaId === parcela.id && x.fecha <= fecha))[0];
+  let mejor = r ? { fecha: r.fecha, lluvia: false } : null;
+  if (leCaeLaLluvia(parcela)) {
+    const lluvias = (datos.ajustes && datos.ajustes.lluvias) || {};
+    Object.keys(lluvias).forEach((f) => {
+      if (lluvias[f] >= LLUVIA_COMO_RIEGO && f <= fecha && (!mejor || f > mejor.fecha)) mejor = { fecha: f, lluvia: true, mm: lluvias[f] };
+    });
+  }
+  return mejor ? { ...mejor, dias: diasEntre(mejor.fecha, fecha) } : null;
+}
+
 export function sinRegar(datos, fecha) {
   return datos.parcelas
     .map((p) => {
-      const r = ordenarPorFecha(datos.riegos.filter((x) => x.parcelaId === p.id && x.fecha <= fecha))[0];
-      return { parcela: p, dias: r ? diasEntre(r.fecha, fecha) : null };
+      const u = ultimaAgua(datos, p, fecha);
+      return { parcela: p, dias: u ? u.dias : null, lluvia: u ? u.lluvia : false };
     })
     .filter((a) => a.dias === null || a.dias >= DIAS_AVISO_RIEGO);
 }

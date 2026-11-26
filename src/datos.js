@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fechaLocal } from './util';
+import { juntarLluvias } from './tiempo';
 
 const CLAVE_ANTIGUA = 'huerto_datos_v1';
 
@@ -59,6 +60,15 @@ export function DatosProvider({ usuarioId, migrar, children }) {
     setDatos((d) => ({ ...d, ajustes: { ...d.ajustes, ...cambios } }));
   }
 
+  function guardarLluvias(nuevas) {
+    setDatos((d) => {
+      const antes = (d.ajustes && d.ajustes.lluvias) || {};
+      const juntas = juntarLluvias(antes, nuevas, fechaLocal());
+      if (JSON.stringify(juntas) === JSON.stringify(antes)) return d;
+      return { ...d, ajustes: { ...d.ajustes, lluvias: juntas } };
+    });
+  }
+
   function reemplazar(nuevos) {
     setDatos((d) => ({ ...vacio, ...nuevos, ajustes: nuevos.ajustes || d.ajustes }));
   }
@@ -96,7 +106,7 @@ export function DatosProvider({ usuarioId, migrar, children }) {
   }
 
   return (
-    <DatosContext.Provider value={{ datos, guardar, borrar, reemplazar, guardarAjustes, cargado }}>
+    <DatosContext.Provider value={{ datos, guardar, borrar, reemplazar, guardarAjustes, guardarLluvias, cargado }}>
       {children}
     </DatosContext.Provider>
   );

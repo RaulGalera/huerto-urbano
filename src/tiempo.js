@@ -30,6 +30,8 @@ export async function buscarCiudad(nombre) {
   }));
 }
 
+export const DIAS_PASADOS = 3;
+
 function urlPrevision(latitud, longitud, modelo) {
   return (
     'https://api.open-meteo.com/v1/forecast?latitude=' +
@@ -38,7 +40,7 @@ function urlPrevision(latitud, longitud, modelo) {
     longitud +
     '&current=temperature_2m,weather_code' +
     '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max' +
-    '&timezone=auto&forecast_days=3' +
+    '&timezone=auto&forecast_days=3&past_days=' + DIAS_PASADOS +
     (modelo ? '&models=' + modelo : '')
   );
 }
@@ -57,7 +59,7 @@ function valor(lista, i, otro) {
 export function combinarPrevision(precisa, general) {
   const base = precisa || general;
   const respaldo = general || precisa;
-  const dias = base.daily.time.map((fecha, i) => ({
+  const todos = base.daily.time.map((fecha, i) => ({
     fecha,
     codigo: valor(base.daily.weather_code, i, valor(respaldo.daily.weather_code, i, 0)),
     maxima: valor(base.daily.temperature_2m_max, i, valor(respaldo.daily.temperature_2m_max, i, 0)),
@@ -65,12 +67,17 @@ export function combinarPrevision(precisa, general) {
     lluvia: valor(base.daily.precipitation_sum, i, valor(respaldo.daily.precipitation_sum, i, 0)),
     probabilidad: valor(respaldo.daily.precipitation_probability_max, i, null),
   }));
+  const hoyLugar = base.current.time ? String(base.current.time).slice(0, 10) : null;
+  const dias = hoyLugar ? todos.filter((d) => d.fecha >= hoyLugar) : todos;
+  const lluvias = {};
+  if (hoyLugar) todos.filter((d) => d.fecha < hoyLugar).forEach((d) => (lluvias[d.fecha] = d.lluvia));
   return {
     actual: {
       temperatura: valor([base.current.temperature_2m], 0, respaldo.current.temperature_2m),
       codigo: valor([base.current.weather_code], 0, respaldo.current.weather_code),
     },
     dias,
+    lluvias,
     modelo: precisa ? 'AROME (Meteo-France)' : 'Open-Meteo',
   };
 }
@@ -86,6 +93,28 @@ export async function obtenerTiempo(latitud, longitud) {
 }
 
 export const LLUVIA_SUFICIENTE = 3;
+export const LLUVIA_COMO_RIEGO = 5;
+const DIAS_GUARDADOS = 30;
+
+export function juntarLluvias(antes, nuevas, hoy) {
+  const limite = new Date(hoy + 'T00:00:00Z');
+  limite.setUTCDate(limite.getUTCDate() - DIAS_GUARDADOS);
+  const desde = limite.toISOString().slice(0, 10);
+  const todas = { ...(antes || {}), ...(nuevas || {}) };
+  const r = {};
+  Object.keys(todas)
+    .filter((f) => f >= desde)
+    .sort()
+    .forEach((f) => (r[f] = todas[f]));
+  return r;
+}
+
+export function lluviaReciente(lluvias) {
+  const fechas = Object.keys(lluvias || {}).filter((f) => lluvias[f] >= LLUVIA_COMO_RIEGO).sort();
+  if (!fechas.length) return null;
+  const fecha = fechas[fechas.length - 1];
+  return { fecha, mm: lluvias[fecha] };
+}
 
 export function consejoRiego(dias) {
   const proximos = dias.slice(0, 2);

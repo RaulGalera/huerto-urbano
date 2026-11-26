@@ -1,4 +1,4 @@
-import { combinarPrevision, consejoRiego, describirCodigo } from '../src/tiempo';
+import { combinarPrevision, consejoRiego, describirCodigo, juntarLluvias, lluviaReciente } from '../src/tiempo';
 
 const dia = (lluvia, maxima) => ({ lluvia, maxima, minima: 5 });
 
@@ -60,4 +60,28 @@ test('si falta el modelo de alta resolucion usa el general', () => {
 
 test('sin probabilidad disponible la deja vacia', () => {
   expect(combinarPrevision(precisa, null).dias[0].probabilidad).toBeNull();
+});
+
+test('separa la lluvia de los dias pasados de la prevision', () => {
+  const conPasado = {
+    current: { time: '2026-11-26T11:00', temperature_2m: 9, weather_code: 1 },
+    daily: {
+      time: ['2026-11-24', '2026-11-25', '2026-11-26', '2026-11-27'],
+      weather_code: [63, 61, 3, 3],
+      temperature_2m_max: [10, 11, 9, 8],
+      temperature_2m_min: [5, 5, 2, 1],
+      precipitation_sum: [7.5, 1, 0, 0],
+      precipitation_probability_max: [90, 60, 0, 0],
+    },
+  };
+  const r = combinarPrevision(null, conPasado);
+  expect(r.dias.map((d) => d.fecha)).toEqual(['2026-11-26', '2026-11-27']);
+  expect(r.lluvias).toEqual({ '2026-11-24': 7.5, '2026-11-25': 1 });
+});
+
+test('junta las lluvias guardadas y borra las de hace mas de un mes', () => {
+  const r = juntarLluvias({ '2026-10-01': 9, '2026-11-20': 2 }, { '2026-11-20': 6, '2026-11-25': 0 }, '2026-11-26');
+  expect(r).toEqual({ '2026-11-20': 6, '2026-11-25': 0 });
+  expect(lluviaReciente(r)).toEqual({ fecha: '2026-11-20', mm: 6 });
+  expect(lluviaReciente({ '2026-11-25': 2 })).toBeNull();
 });
